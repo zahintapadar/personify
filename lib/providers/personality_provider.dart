@@ -1,0 +1,301 @@
+import 'package:flutter/foundation.dart';
+import '../models/personality_question.dart';
+import '../models/personality_result.dart';
+import '../services/ml_service.dart';
+
+class PersonalityProvider extends ChangeNotifier {
+  final MLService _mlService = MLService();
+  
+  // Test state
+  int _currentQuestionIndex = 0;
+  final Map<String, dynamic> _answers = {};
+  bool _isTestCompleted = false;
+  PersonalityResult? _result;
+  bool _isLoading = false;
+  
+  // Questions for the personality test
+  final List<PersonalityQuestion> _questions = [
+    PersonalityQuestion(
+      id: 'time_alone',
+      title: 'Time Spent Alone',
+      question: 'How much time do you prefer to spend alone?',
+      options: ['Very little', 'Some time', 'Moderate amount', 'Quite a bit', 'A lot'],
+      values: [1, 2, 3, 4, 5],
+    ),
+    PersonalityQuestion(
+      id: 'stage_fear',
+      title: 'Stage Fear',
+      question: 'How comfortable are you speaking in front of groups?',
+      options: ['Very comfortable', 'Somewhat comfortable', 'Neutral', 'Somewhat uncomfortable', 'Very uncomfortable'],
+      values: [1, 2, 3, 4, 5],
+    ),
+    PersonalityQuestion(
+      id: 'social_events',
+      title: 'Social Event Attendance',
+      question: 'How often do you attend social events?',
+      options: ['Always', 'Often', 'Sometimes', 'Rarely', 'Never'],
+      values: [5, 4, 3, 2, 1],
+    ),
+    PersonalityQuestion(
+      id: 'going_outside',
+      title: 'Going Outside',
+      question: 'How often do you enjoy going outside and being active?',
+      options: ['Always', 'Often', 'Sometimes', 'Rarely', 'Never'],
+      values: [5, 4, 3, 2, 1],
+    ),
+    PersonalityQuestion(
+      id: 'drained_socializing',
+      title: 'Energy After Socializing',
+      question: 'How do you feel after socializing for a long time?',
+      options: ['Energized', 'Slightly energized', 'Neutral', 'Slightly drained', 'Very drained'],
+      values: [1, 2, 3, 4, 5],
+    ),
+    PersonalityQuestion(
+      id: 'friends_circle',
+      title: 'Friends Circle Size',
+      question: 'How would you describe your ideal friends circle?',
+      options: ['Very large', 'Large', 'Medium', 'Small', 'Very small'],
+      values: [5, 4, 3, 2, 1],
+    ),
+    PersonalityQuestion(
+      id: 'post_frequency',
+      title: 'Social Media Posting',
+      question: 'How often do you post on social media?',
+      options: ['Very frequently', 'Frequently', 'Sometimes', 'Rarely', 'Never'],
+      values: [5, 4, 3, 2, 1],
+    ),
+  ];
+  
+  // Getters
+  int get currentQuestionIndex => _currentQuestionIndex;
+  Map<String, dynamic> get answers => _answers;
+  bool get isTestCompleted => _isTestCompleted;
+  PersonalityResult? get result => _result;
+  bool get isLoading => _isLoading;
+  List<PersonalityQuestion> get questions => _questions;
+  PersonalityQuestion get currentQuestion => _questions[_currentQuestionIndex];
+  double get progress => (_currentQuestionIndex + 1) / _questions.length;
+  bool get hasNextQuestion => _currentQuestionIndex < _questions.length - 1;
+  bool get hasPreviousQuestion => _currentQuestionIndex > 0;
+  
+  // Initialize ML service
+  Future<void> initializeML() async {
+    _isLoading = true;
+    notifyListeners();
+    
+    try {
+      await _mlService.initialize();
+      debugPrint('ML Service initialized successfully');
+    } catch (e) {
+      debugPrint('Error initializing ML service: $e');
+      // Continue without ML service for now
+    }
+    
+    _isLoading = false;
+    notifyListeners();
+  }
+  
+  // Answer a question
+  void answerQuestion(String questionId, int value) {
+    _answers[questionId] = value;
+    notifyListeners();
+  }
+  
+  // Navigate to next question
+  void nextQuestion() {
+    if (hasNextQuestion && _currentQuestionIndex < _questions.length - 1) {
+      _currentQuestionIndex++;
+      notifyListeners();
+    }
+  }
+  
+  // Navigate to previous question
+  void previousQuestion() {
+    if (hasPreviousQuestion && _currentQuestionIndex > 0) {
+      _currentQuestionIndex--;
+      notifyListeners();
+    }
+  }
+  
+  // Complete the test and get results
+  Future<void> completeTest() async {
+    if (_answers.length != _questions.length) {
+      throw Exception('Please answer all questions before completing the test.');
+    }
+    
+    _isLoading = true;
+    notifyListeners();
+    
+    try {
+      // Prepare input for ML model
+      List<double> input = [
+        _answers['time_alone']?.toDouble() ?? 0.0,
+        _answers['stage_fear']?.toDouble() ?? 0.0,
+        _answers['social_events']?.toDouble() ?? 0.0,
+        _answers['going_outside']?.toDouble() ?? 0.0,
+        _answers['drained_socializing']?.toDouble() ?? 0.0,
+        _answers['friends_circle']?.toDouble() ?? 0.0,
+        _answers['post_frequency']?.toDouble() ?? 0.0,
+      ];
+      
+      double prediction;
+      
+      // Try to get prediction from ML model
+      if (_mlService.isInitialized) {
+        try {
+          prediction = await _mlService.predict(input);
+        } catch (e) {
+          debugPrint('ML prediction failed, using fallback: $e');
+          prediction = _calculateFallbackPrediction(input);
+        }
+      } else {
+        debugPrint('ML service not initialized, using fallback prediction');
+        prediction = _calculateFallbackPrediction(input);
+      }
+      
+      // Create result
+      _result = PersonalityResult(
+        personalityType: prediction > 0.5 ? 'Extrovert' : 'Introvert',
+        confidence: prediction > 0.5 ? prediction : (1 - prediction),
+        description: _getPersonalityDescription(prediction > 0.5 ? 'Extrovert' : 'Introvert'),
+        traits: _getPersonalityTraits(prediction > 0.5 ? 'Extrovert' : 'Introvert'),
+        strengths: _getPersonalityStrengths(prediction > 0.5 ? 'Extrovert' : 'Introvert'),
+        tips: _getPersonalityTips(prediction > 0.5 ? 'Extrovert' : 'Introvert'),
+        answers: Map.from(_answers),
+      );
+      
+      _isTestCompleted = true;
+    } catch (e) {
+      debugPrint('Error completing test: $e');
+      rethrow;
+    }
+    
+    _isLoading = false;
+    notifyListeners();
+  }
+  
+  // Fallback prediction when ML model is not available
+  double _calculateFallbackPrediction(List<double> input) {
+    // Simple heuristic based on question answers
+    // Lower values generally indicate introversion, higher values extroversion
+    double timeAlone = input[0]; // 1-5, higher = more alone time (introvert)
+    double stageFear = input[1]; // 0-1, 1 = fear (introvert)
+    double socialEvents = input[2]; // 1-5, higher = more social (extrovert)
+    double goingOutside = input[3]; // 1-5, higher = more active (extrovert)
+    double drainedSocializing = input[4]; // 0-1, 1 = drained (introvert)
+    double friendsCircle = input[5]; // 1-5, higher = larger circle (extrovert)
+    double postFrequency = input[6]; // 1-5, higher = more posts (extrovert)
+    
+    // Calculate weighted score (higher = more extroverted)
+    double extrovertScore = 
+        (6 - timeAlone) * 0.2 + // Invert time alone
+        (1 - stageFear) * 0.15 + // Invert stage fear
+        socialEvents * 0.2 +
+        goingOutside * 0.15 +
+        (1 - drainedSocializing) * 0.15 + // Invert drained feeling
+        friendsCircle * 0.1 +
+        postFrequency * 0.05;
+    
+    // Normalize to 0-1 range
+    double normalizedScore = (extrovertScore - 1) / 4; // Assuming max possible is 5, min is 1
+    
+    // Ensure it's within bounds
+    normalizedScore = normalizedScore.clamp(0.0, 1.0);
+    
+    debugPrint('Fallback prediction calculated: $normalizedScore');
+    return normalizedScore;
+  }
+  
+  // Reset the test
+  void resetTest() {
+    _currentQuestionIndex = 0;
+    _answers.clear();
+    _isTestCompleted = false;
+    _result = null;
+    notifyListeners();
+  }
+  
+  // Get personality description
+  String _getPersonalityDescription(String personalityType) {
+    if (personalityType == 'Extrovert') {
+      return 'You are energized by social interactions and tend to be outgoing, talkative, and assertive. You enjoy being around people and often seek out social situations.';
+    } else {
+      return 'You are energized by solitude and tend to be reflective, reserved, and thoughtful. You prefer smaller groups and often enjoy quiet activities.';
+    }
+  }
+  
+  // Get personality traits
+  List<String> _getPersonalityTraits(String personalityType) {
+    if (personalityType == 'Extrovert') {
+      return [
+        'Outgoing and sociable',
+        'Energized by social interactions',
+        'Enjoys being the center of attention',
+        'Thinks out loud',
+        'Acts first, thinks later',
+        'Prefers variety and action',
+      ];
+    } else {
+      return [
+        'Reflective and reserved',
+        'Energized by solitude',
+        'Prefers one-on-one conversations',
+        'Thinks before speaking',
+        'Thinks first, acts later',
+        'Prefers depth over breadth',
+      ];
+    }
+  }
+  
+  // Get personality strengths
+  List<String> _getPersonalityStrengths(String personalityType) {
+    if (personalityType == 'Extrovert') {
+      return [
+        'Natural leader and motivator',
+        'Excellent at networking and building relationships',
+        'Quick decision-making abilities',
+        'Comfortable with public speaking',
+        'Adaptable to new situations',
+        'Great at energizing teams',
+      ];
+    } else {
+      return [
+        'Deep thinking and analytical skills',
+        'Excellent listener and observer',
+        'Strong focus and concentration',
+        'Thoughtful decision-making',
+        'Independent problem-solving',
+        'Calm under pressure',
+      ];
+    }
+  }
+  
+  // Get personality tips
+  List<String> _getPersonalityTips(String personalityType) {
+    if (personalityType == 'Extrovert') {
+      return [
+        'Take time for self-reflection and quiet moments',
+        'Practice active listening in conversations',
+        'Consider others\' need for processing time',
+        'Balance social activities with downtime',
+        'Think before making important decisions',
+        'Respect introverted colleagues\' working styles',
+      ];
+    } else {
+      return [
+        'Push yourself to participate in group discussions',
+        'Practice expressing ideas before they\'re perfect',
+        'Schedule regular social interactions',
+        'Share your insights and expertise with others',
+        'Take on small leadership opportunities',
+        'Build one meaningful relationship at a time',
+      ];
+    }
+  }
+  
+  @override
+  void dispose() {
+    _mlService.dispose();
+    super.dispose();
+  }
+}
