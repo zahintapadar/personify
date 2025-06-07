@@ -105,6 +105,37 @@ class _WelcomeScreenState extends State<WelcomeScreen>
             padding: const EdgeInsets.all(24.0),
             child: Column(
               children: [
+                // Top bar with history button
+                Row(
+                  children: [
+                    Consumer<PersonalityProvider>(
+                      builder: (context, provider, child) {
+                        return provider.testHistory.isNotEmpty
+                            ? Container(
+                                decoration: BoxDecoration(
+                                  color: Colors.white.withOpacity(0.1),
+                                  borderRadius: BorderRadius.circular(12),
+                                  border: Border.all(
+                                    color: Colors.white.withOpacity(0.2),
+                                  ),
+                                ),
+                                child: IconButton(
+                                  onPressed: () => context.go('/history'),
+                                  icon: const Icon(
+                                    Icons.history_rounded,
+                                    color: Colors.white,
+                                    size: 24,
+                                  ),
+                                  tooltip: 'View Test History',
+                                ),
+                              )
+                            : const SizedBox.shrink();
+                      },
+                    ),
+                    const Spacer(),
+                  ],
+                ),
+                
                 Expanded(
                   child: AnimationLimiter(
                     child: Column(

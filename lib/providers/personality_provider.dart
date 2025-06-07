@@ -1,4 +1,6 @@
 import 'package:flutter/foundation.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'dart:convert';
 import '../models/personality_question.dart';
 import '../models/personality_result.dart';
 import '../services/ml_service.dart';
@@ -12,6 +14,10 @@ class PersonalityProvider extends ChangeNotifier {
   bool _isTestCompleted = false;
   PersonalityResult? _result;
   bool _isLoading = false;
+  
+  // History state
+  List<PersonalityResult> _testHistory = [];
+  static const String _historyKey = 'personality_test_history';
   
   // Questions for the personality test
   final List<PersonalityQuestion> _questions = [
@@ -77,6 +83,7 @@ class PersonalityProvider extends ChangeNotifier {
   double get progress => (_currentQuestionIndex + 1) / _questions.length;
   bool get hasNextQuestion => _currentQuestionIndex < _questions.length - 1;
   bool get hasPreviousQuestion => _currentQuestionIndex > 0;
+  List<PersonalityResult> get testHistory => _testHistory;
   
   // Initialize ML service
   Future<void> initializeML() async {
@@ -85,6 +92,7 @@ class PersonalityProvider extends ChangeNotifier {
     
     try {
       await _mlService.initialize();
+      await _loadTestHistory(); // Load saved history
       debugPrint('ML Service initialized successfully');
     } catch (e) {
       debugPrint('Error initializing ML service: $e');
@@ -165,12 +173,87 @@ class PersonalityProvider extends ChangeNotifier {
       );
       
       _isTestCompleted = true;
+      
+      // Save to history
+      await _saveTestToHistory(_result!);
     } catch (e) {
       debugPrint('Error completing test: $e');
       rethrow;
     }
     
     _isLoading = false;
+    notifyListeners();
+  }
+  
+  // Load test history from SharedPreferences
+  Future<void> _loadTestHistory() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final historyJson = prefs.getString(_historyKey);
+      
+      if (historyJson != null) {
+        final historyList = jsonDecode(historyJson) as List;
+        _testHistory = historyList
+            .map((json) => PersonalityResult.fromJson(json))
+            .toList();
+        debugPrint('Loaded ${_testHistory.length} test results from history');
+      }
+    } catch (e) {
+      debugPrint('Error loading test history: $e');
+      _testHistory = [];
+    }
+  }
+  
+  // Save test result to history
+  Future<void> _saveTestToHistory(PersonalityResult result) async {
+    try {
+      // Add current test result with timestamp
+      final resultWithTimestamp = PersonalityResult(
+        personalityType: result.personalityType,
+        confidence: result.confidence,
+        description: result.description,
+        traits: result.traits,
+        strengths: result.strengths,
+        tips: result.tips,
+        answers: result.answers,
+        timestamp: DateTime.now(), // Add timestamp
+      );
+      
+      _testHistory.insert(0, resultWithTimestamp); // Add to beginning
+      
+      // Keep only last 10 results
+      if (_testHistory.length > 10) {
+        _testHistory = _testHistory.take(10).toList();
+      }
+      
+      // Save to SharedPreferences
+      final prefs = await SharedPreferences.getInstance();
+      final historyJson = jsonEncode(_testHistory.map((r) => r.toJson()).toList());
+      await prefs.setString(_historyKey, historyJson);
+      
+      debugPrint('Saved test result to history. Total results: ${_testHistory.length}');
+    } catch (e) {
+      debugPrint('Error saving test to history: $e');
+    }
+  }
+  
+  // Clear test history
+  Future<void> clearTestHistory() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.remove(_historyKey);
+      _testHistory.clear();
+      notifyListeners();
+      debugPrint('Test history cleared');
+    } catch (e) {
+      debugPrint('Error clearing test history: $e');
+    }
+  }
+  
+  // Set a historical result as current (for viewing details)
+  void setHistoricalResult(PersonalityResult result) {
+    _result = result;
+    _isTestCompleted = true;
     notifyListeners();
   }
   
