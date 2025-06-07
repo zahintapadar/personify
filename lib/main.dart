@@ -6,6 +6,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'screens/welcome_screen.dart';
 import 'screens/personality_test_screen.dart';
 import 'screens/results_screen.dart';
+import 'screens/history_screen.dart';
 import 'providers/personality_provider.dart';
 
 void main() {
@@ -36,6 +37,10 @@ final GoRouter _router = GoRouter(
     GoRoute(
       path: '/results',
       builder: (context, state) => const ResultsScreen(),
+    ),
+    GoRoute(
+      path: '/history',
+      builder: (context, state) => const HistoryScreen(),
     ),
   ],
 );
