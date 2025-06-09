@@ -85,22 +85,41 @@ class PersonalityProvider extends ChangeNotifier {
   bool get hasPreviousQuestion => _currentQuestionIndex > 0;
   List<PersonalityResult> get testHistory => _testHistory;
   
+  // Get ML service status
+  bool get isMLServiceReady => _mlService.isInitialized;
+  String get mlServiceStatus => _mlService.isInitialized ? 'Ready' : 'Not Available';
+  
   // Initialize ML service
   Future<void> initializeML() async {
     _isLoading = true;
     notifyListeners();
     
     try {
+      debugPrint('Initializing ML service...');
       await _mlService.initialize();
       await _loadTestHistory(); // Load saved history
-      debugPrint('ML Service initialized successfully');
+      debugPrint('ML Service initialization completed. Status: ${_mlService.isInitialized}');
     } catch (e) {
       debugPrint('Error initializing ML service: $e');
-      // Continue without ML service for now
+      // Continue without ML service - fallback algorithm will be used
     }
     
     _isLoading = false;
     notifyListeners();
+  }
+  
+  // Manually retry ML service initialization
+  Future<bool> retryMLInitialization() async {
+    try {
+      debugPrint('Retrying ML service initialization...');
+      await _mlService.initialize();
+      debugPrint('ML Service retry completed. Status: ${_mlService.isInitialized}');
+      notifyListeners();
+      return _mlService.isInitialized;
+    } catch (e) {
+      debugPrint('ML service retry failed: $e');
+      return false;
+    }
   }
   
   // Answer a question
@@ -135,7 +154,7 @@ class PersonalityProvider extends ChangeNotifier {
     notifyListeners();
     
     try {
-      // Prepare input for ML model
+      // Prepare input for ML model (all values should be 1-5 scale)
       List<double> input = [
         _answers['time_alone']?.toDouble() ?? 0.0,
         _answers['stage_fear']?.toDouble() ?? 0.0,
@@ -146,29 +165,42 @@ class PersonalityProvider extends ChangeNotifier {
         _answers['post_frequency']?.toDouble() ?? 0.0,
       ];
       
+      debugPrint('Processing personality test with input: $input');
+      
       double prediction;
+      String predictionSource = 'ML Model';
       
       // Try to get prediction from ML model
       if (_mlService.isInitialized) {
         try {
+          debugPrint('Attempting ML prediction...');
           prediction = await _mlService.predict(input);
+          debugPrint('ML prediction successful: $prediction');
         } catch (e) {
           debugPrint('ML prediction failed, using fallback: $e');
           prediction = _calculateFallbackPrediction(input);
+          predictionSource = 'Fallback Algorithm';
         }
       } else {
         debugPrint('ML service not initialized, using fallback prediction');
         prediction = _calculateFallbackPrediction(input);
+        predictionSource = 'Fallback Algorithm';
       }
+      
+      // Determine personality type and confidence
+      String personalityType = prediction > 0.5 ? 'Extrovert' : 'Introvert';
+      double confidence = prediction > 0.5 ? prediction : (1 - prediction);
+      
+      debugPrint('Final prediction: $prediction, Type: $personalityType, Confidence: ${(confidence * 100).toInt()}%, Source: $predictionSource');
       
       // Create result
       _result = PersonalityResult(
-        personalityType: prediction > 0.5 ? 'Extrovert' : 'Introvert',
-        confidence: prediction > 0.5 ? prediction : (1 - prediction),
-        description: _getPersonalityDescription(prediction > 0.5 ? 'Extrovert' : 'Introvert'),
-        traits: _getPersonalityTraits(prediction > 0.5 ? 'Extrovert' : 'Introvert'),
-        strengths: _getPersonalityStrengths(prediction > 0.5 ? 'Extrovert' : 'Introvert'),
-        tips: _getPersonalityTips(prediction > 0.5 ? 'Extrovert' : 'Introvert'),
+        personalityType: personalityType,
+        confidence: confidence,
+        description: _getPersonalityDescription(personalityType),
+        traits: _getPersonalityTraits(personalityType),
+        strengths: _getPersonalityStrengths(personalityType),
+        tips: _getPersonalityTips(personalityType),
         answers: Map.from(_answers),
       );
       
@@ -176,6 +208,8 @@ class PersonalityProvider extends ChangeNotifier {
       
       // Save to history
       await _saveTestToHistory(_result!);
+      
+      debugPrint('Test completed successfully and saved to history');
     } catch (e) {
       debugPrint('Error completing test: $e');
       rethrow;
@@ -260,32 +294,32 @@ class PersonalityProvider extends ChangeNotifier {
   // Fallback prediction when ML model is not available
   double _calculateFallbackPrediction(List<double> input) {
     // Simple heuristic based on question answers
-    // Lower values generally indicate introversion, higher values extroversion
+    // All values are on 1-5 scale, consistent with ML service expectations
     double timeAlone = input[0]; // 1-5, higher = more alone time (introvert)
-    double stageFear = input[1]; // 0-1, 1 = fear (introvert)
+    double stageFear = input[1]; // 1-5, higher = more fear (introvert)
     double socialEvents = input[2]; // 1-5, higher = more social (extrovert)
     double goingOutside = input[3]; // 1-5, higher = more active (extrovert)
-    double drainedSocializing = input[4]; // 0-1, 1 = drained (introvert)
+    double drainedSocializing = input[4]; // 1-5, higher = more drained (introvert)
     double friendsCircle = input[5]; // 1-5, higher = larger circle (extrovert)
     double postFrequency = input[6]; // 1-5, higher = more posts (extrovert)
     
     // Calculate weighted score (higher = more extroverted)
     double extrovertScore = 
         (6 - timeAlone) * 0.2 + // Invert time alone
-        (1 - stageFear) * 0.15 + // Invert stage fear
+        (6 - stageFear) * 0.15 + // Invert stage fear
         socialEvents * 0.2 +
         goingOutside * 0.15 +
-        (1 - drainedSocializing) * 0.15 + // Invert drained feeling
+        (6 - drainedSocializing) * 0.15 + // Invert drained feeling
         friendsCircle * 0.1 +
         postFrequency * 0.05;
     
     // Normalize to 0-1 range
     double normalizedScore = (extrovertScore - 1) / 4; // Assuming max possible is 5, min is 1
     
-    // Ensure it's within bounds
-    normalizedScore = normalizedScore.clamp(0.0, 1.0);
+    // Ensure it's within bounds and add slight variance for realism
+    normalizedScore = (normalizedScore.clamp(0.0, 1.0) * 0.8 + 0.1);
     
-    debugPrint('Fallback prediction calculated: $normalizedScore');
+    debugPrint('Fallback prediction calculated: $normalizedScore for input: $input');
     return normalizedScore;
   }
   
