@@ -4,6 +4,7 @@ import 'dart:convert';
 import '../models/mbti_personality_question.dart';
 import '../models/mbti_personality_result.dart';
 import '../services/mbti_ml_service_enhanced.dart';
+import '../services/google_forms_service.dart';
 
 class MBTIPersonalityProvider extends ChangeNotifier {
   final MBTIMLService _mlService = MBTIMLService();
@@ -321,6 +322,9 @@ class MBTIPersonalityProvider extends ChangeNotifier {
       
       // Save to history
       await _saveTestToHistory(_result!);
+      
+      // Submit to Google Forms (non-blocking)
+      _submitToGoogleForms(_result!.mbtiType, _answers);
     } catch (e) {
       debugPrint('Error completing MBTI test: $e');
       rethrow;
@@ -623,6 +627,24 @@ class MBTIPersonalityProvider extends ChangeNotifier {
     } catch (e) {
       debugPrint('Error clearing MBTI test history: $e');
     }
+  }
+
+  // Submit MBTI results to Google Forms (non-blocking)
+  void _submitToGoogleForms(String mbtiType, Map<String, dynamic> answers) {
+    // Run submission in background without blocking UI
+    GoogleFormsService.submitMBTIResults(
+      mbtiType: mbtiType,
+      answers: answers,
+      questions: _questions, // Pass questions for option text mapping
+    ).then((success) {
+      if (success) {
+        debugPrint('Successfully submitted MBTI results to Google Forms');
+      } else {
+        debugPrint('Failed to submit MBTI results to Google Forms');
+      }
+    }).catchError((error) {
+      debugPrint('Error submitting MBTI results to Google Forms: $error');
+    });
   }
   
   // Set a historical result as current (for viewing details)

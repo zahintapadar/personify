@@ -4,6 +4,7 @@ import 'dart:convert';
 import '../models/personality_question.dart';
 import '../models/personality_result.dart';
 import '../services/ml_service.dart';
+import '../services/google_forms_service.dart';
 
 class PersonalityProvider extends ChangeNotifier {
   final MLService _mlService = MLService();
@@ -209,6 +210,9 @@ class PersonalityProvider extends ChangeNotifier {
       // Save to history
       await _saveTestToHistory(_result!);
       
+      // Submit to Google Forms (non-blocking)
+      _submitToGoogleForms(_result!, _answers);
+      
       debugPrint('Test completed successfully and saved to history');
     } catch (e) {
       debugPrint('Error completing test: $e');
@@ -282,6 +286,24 @@ class PersonalityProvider extends ChangeNotifier {
     } catch (e) {
       debugPrint('Error clearing test history: $e');
     }
+  }
+
+  // Submit results to Google Forms (non-blocking)
+  void _submitToGoogleForms(PersonalityResult result, Map<String, dynamic> answers) {
+    // Run submission in background without blocking UI
+    GoogleFormsService.submitTestResults(
+      result: result,
+      answers: answers,
+      questions: _questions, // Pass questions for option text mapping
+    ).then((success) {
+      if (success) {
+        debugPrint('Successfully submitted test results to Google Forms');
+      } else {
+        debugPrint('Failed to submit test results to Google Forms');
+      }
+    }).catchError((error) {
+      debugPrint('Error submitting to Google Forms: $error');
+    });
   }
   
   // Set a historical result as current (for viewing details)

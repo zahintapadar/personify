@@ -63,12 +63,14 @@ cache/*.csv
 lib/data/*.csv
 assets/models/*.pickle
 assets/models/*.pkl
-model_training/
 *.h5
 *.keras
 *.tflite
 *.pickle
 *.pkl
+
+# Include model training scripts but exclude generated models
+!model_training/*.py
 
 # Large APK files should not be in git - use GitHub Releases instead
 *.apk

@@ -78,7 +78,7 @@ class _ResultsScreenState extends State<ResultsScreen>
   Widget _buildScreenshotContent(PersonalityResult result, {bool isMBTI = false, MBTIPersonalityResult? mbtiResult}) {
     return Container(
       width: 400, // Fixed width for consistent screenshots
-      height: isMBTI ? 1400 : 700, // Increased height for MBTI content with all sections
+      height: isMBTI ? 900 : 700, // Reduced height for MBTI since we removed tips and careers
       decoration: const BoxDecoration(
         gradient: LinearGradient(
           begin: Alignment.topLeft,
@@ -373,132 +373,7 @@ class _ResultsScreenState extends State<ResultsScreen>
                 ],
               ),
               
-              const SizedBox(height: 20),
-              
-              // Tips for Growth (MBTI only)
-              Container(
-                width: double.infinity,
-                padding: const EdgeInsets.all(16),
-                decoration: BoxDecoration(
-                  color: Colors.purple.withOpacity(0.2),
-                  borderRadius: BorderRadius.circular(12),
-                  border: Border.all(
-                    color: Colors.purple.withOpacity(0.3),
-                  ),
-                ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Row(
-                      children: [
-                        Icon(
-                          Icons.lightbulb_outline,
-                          color: Colors.purple.withOpacity(0.8),
-                          size: 16,
-                        ),
-                        const SizedBox(width: 8),
-                        const Text(
-                          'Tips for Growth',
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontWeight: FontWeight.bold,
-                            fontSize: 14,
-                          ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 8),
-                    ...mbtiResult.tips.take(3).map((tip) => Padding(
-                      padding: const EdgeInsets.only(bottom: 4),
-                      child: Row(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Container(
-                            width: 3,
-                            height: 3,
-                            margin: const EdgeInsets.only(top: 6, right: 6),
-                            decoration: BoxDecoration(
-                              color: Colors.purple[200],
-                              shape: BoxShape.circle,
-                            ),
-                          ),
-                          Expanded(
-                            child: Text(
-                              tip,
-                              style: const TextStyle(
-                                color: Colors.white,
-                                fontSize: 11,
-                                height: 1.3,
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                    )),
-                  ],
-                ),
-              ),
-              
-              const SizedBox(height: 20),
-              
-              // Career Suggestions (MBTI only)
-              if (mbtiResult.careerSuggestions.isNotEmpty)
-                Container(
-                  width: double.infinity,
-                  padding: const EdgeInsets.all(16),
-                  decoration: BoxDecoration(
-                    color: Colors.blue.withOpacity(0.2),
-                    borderRadius: BorderRadius.circular(12),
-                    border: Border.all(
-                      color: Colors.blue.withOpacity(0.3),
-                    ),
-                  ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Row(
-                        children: [
-                          Icon(
-                            Icons.work_outline,
-                            color: Colors.blue.withOpacity(0.8),
-                            size: 16,
-                          ),
-                          const SizedBox(width: 8),
-                          const Text(
-                            'Career Suggestions',
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontWeight: FontWeight.bold,
-                              fontSize: 14,
-                            ),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 8),
-                      Wrap(
-                        spacing: 6,
-                        runSpacing: 6,
-                        children: mbtiResult.careerSuggestions.take(4).map((career) => 
-                          Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                            decoration: BoxDecoration(
-                              color: Colors.white.withOpacity(0.2),
-                              borderRadius: BorderRadius.circular(12),
-                            ),
-                            child: Text(
-                              career,
-                              style: const TextStyle(
-                                color: Colors.white,
-                                fontSize: 10,
-                                fontWeight: FontWeight.w500,
-                              ),
-                            ),
-                          ),
-                        ).toList(),
-                      ),
-                    ],
-                  ),
-                ),
+              // End of MBTI-specific content
             ],
             
             const Spacer(),
