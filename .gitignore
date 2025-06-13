@@ -43,3 +43,25 @@ app.*.map.json
 /android/app/debug
 /android/app/profile
 /android/app/release
+lib/data/mbti_personality.csv
+cache/advanced_tfidf_features_5000_2affa328.pkl
+assets/models/mbti_optimized_vectorizer.pickle
+cache/advanced_tfidf_vectorizer_5000_2affa328.pkl
+# .gitignore
+cache/tfidf_features_1000.pkl
+lib/data/mbti_1.csv
+lib/data/mbti_personality.csv
+cache/advanced_tfidf_features_5000_2affa328.pkl
+assets/models/mbti_optimized_vectorizer.pickle
+cache/advanced_tfidf_vectorizer_5000_2affa328.pkl# Large files that should not be in git
+cache/*.pkl
+cache/*.csv
+lib/data/*.csv
+assets/models/*.pickle
+assets/models/*.pkl
+model_training/
+*.h5
+*.keras
+*.tflite
+*.pickle
+*.pkl

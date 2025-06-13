@@ -7,7 +7,7 @@ plugins {
 
 android {
     namespace = "com.Personify.Zahin"
-    compileSdk = flutter.compileSdkVersion
+    compileSdk = 35
     ndkVersion = "27.0.12077973"
 
     compileOptions {
@@ -25,7 +25,7 @@ android {
         // You can update the following values to match your application needs.
         // For more information, see: https://flutter.dev/to/review-gradle-config.
         minSdk = 21
-        targetSdk = 31  // Android 12 (API level 31)
+        targetSdk = 34  // Android 14 (API level 34) - Latest stable
         versionCode = flutter.versionCode
         versionName = flutter.versionName
     }

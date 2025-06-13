@@ -15,12 +15,12 @@ class GradientBackground extends StatelessWidget {
     return Container(
       decoration: BoxDecoration(
         gradient: LinearGradient(
-          begin: Alignment.topLeft,
+          tileMode: TileMode.mirror,
+          begin: Alignment.topRight,
           end: Alignment.bottomRight,
           colors: colors ?? [
-            const Color(0xFF421DA9), // 66, 29, 169
-            const Color(0xFFFF5934), // 255, 89, 52
-            const Color(0xFF421DA9), // 66, 29, 169
+            const Color(0xfff44336), // Red
+            const Color(0xff2196f3), // Blue
           ],
         ),
       ),
