@@ -1,0 +1,734 @@
+{
+  "cognitive_functions": {
+    "Ni": {
+      "name": "Introverted Intuition",
+      "short_name": "Ni",
+      "description": "The ability to see patterns, connections, and future possibilities. You naturally synthesize information to form insights and see the bigger picture.",
+      "characteristics": [
+        "Sees patterns and connections others miss",
+        "Focuses on future possibilities and implications",
+        "Synthesizes complex information into insights",
+        "Has strong intuitive hunches about outcomes"
+      ]
+    },
+    "Ne": {
+      "name": "Extraverted Intuition", 
+      "short_name": "Ne",
+      "description": "The ability to explore possibilities, generate ideas, and see connections between different concepts. You naturally brainstorm and think outside the box.",
+      "characteristics": [
+        "Generates multiple ideas and possibilities",
+        "Sees connections between unrelated concepts",
+        "Enjoys brainstorming and creative thinking",
+        "Adapts quickly to new situations"
+      ]
+    },
+    "Si": {
+      "name": "Introverted Sensing",
+      "short_name": "Si", 
+      "description": "The ability to recall past experiences and compare them to present situations. You value tradition, consistency, and proven methods.",
+      "characteristics": [
+        "Compares present to past experiences",
+        "Values tradition and proven methods",
+        "Notices details and maintains routines",
+        "Learns from personal experience"
+      ]
+    },
+    "Se": {
+      "name": "Extraverted Sensing",
+      "short_name": "Se",
+      "description": "The ability to be present in the moment and respond to immediate opportunities. You notice environmental details and adapt quickly to changes.",
+      "characteristics": [
+        "Lives in the present moment",
+        "Notices immediate environmental details",
+        "Responds quickly to opportunities",
+        "Enjoys hands-on experiences"
+      ]
+    },
+    "Ti": {
+      "name": "Introverted Thinking",
+      "short_name": "Ti",
+      "description": "The ability to analyze information logically and create internal frameworks for understanding. You seek logical consistency and precision.",
+      "characteristics": [
+        "Analyzes information for logical consistency",
+        "Creates internal frameworks and models",
+        "Values precision and accuracy",
+        "Questions assumptions and seeks truth"
+      ]
+    },
+    "Te": {
+      "name": "Extraverted Thinking",
+      "short_name": "Te",
+      "description": "The ability to organize and systematize the external world efficiently. You focus on results, productivity, and logical organization.",
+      "characteristics": [
+        "Organizes external world efficiently",
+        "Focuses on results and productivity",
+        "Creates systems and processes",
+        "Makes decisions based on objective criteria"
+      ]
+    },
+    "Fi": {
+      "name": "Introverted Feeling",
+      "short_name": "Fi",
+      "description": "The ability to evaluate based on personal values and maintain inner harmony. You have strong personal convictions and seek authenticity.",
+      "characteristics": [
+        "Evaluates based on personal values",
+        "Seeks authenticity and inner harmony",
+        "Has strong personal convictions",
+        "Maintains individual identity"
+      ]
+    },
+    "Fe": {
+      "name": "Extraverted Feeling",
+      "short_name": "Fe",
+      "description": "The ability to understand and respond to others' emotions and create group harmony. You naturally consider others' feelings and social dynamics.",
+      "characteristics": [
+        "Understands others' emotions and needs",
+        "Creates harmony in group settings",
+        "Considers social impact of decisions",
+        "Builds consensus and relationships"
+      ]
+    }
+  },
+  "personality_types": {
+    "INTJ": {
+      "nickname": "The Architect",
+      "description": "INTJs are strategic, independent, and highly analytical visionaries who see possibilities for improvement everywhere. They have a natural gift for seeing the big picture and developing long-term plans to achieve their vision.",
+      "detailed_description": "INTJs are natural born leaders, though they usually prefer to stay in the background until they see a real need to take over the lead. They are supreme strategists and are not easily deterred from their goals. They live in a world of ideas and strategic planning, and they value intelligence, knowledge, and competence. INTJs are perfectionists, and they apply this standard to everything they do, including their relationships.",
+      "strengths": [
+        "Strategic thinking and long-term planning",
+        "Independent and self-confident",
+        "Determined and decisive",
+        "Innovative and creative problem-solving",
+        "Analytical and objective thinking"
+      ],
+      "challenges": [
+        "Can be overly critical of themselves and others",
+        "May dismiss emotions and feelings as irrelevant", 
+        "Perfectionist tendencies can lead to procrastination",
+        "May have difficulty expressing emotions",
+        "Can appear arrogant or aloof to others"
+      ],
+      "cognitive_stack_explanation": "Your mind works through four main cognitive functions in this order:",
+      "dominant_function": "Ni - Your primary way of processing information is through Introverted Intuition, which gives you the ability to see patterns and future possibilities.",
+      "auxiliary_function": "Te - Your supporting function is Extraverted Thinking, which helps you organize and systematize your insights into actionable plans.",
+      "tertiary_function": "Fi - Your developing function is Introverted Feeling, which connects you to your personal values and authenticity.",
+      "inferior_function": "Se - Your least developed function is Extraverted Sensing, which can make you less aware of immediate physical details.",
+      "career_matches": [
+        "Software Architect",
+        "Research Scientist", 
+        "Strategic Planner",
+        "Systems Analyst",
+        "Investment Banker",
+        "University Professor"
+      ],
+      "famous_examples": [
+        "Elon Musk",
+        "Isaac Newton", 
+        "Nikola Tesla",
+        "Friedrich Nietzsche",
+        "Ayn Rand"
+      ],
+      "learn_more_url": "https://www.16personalities.com/intj-personality"
+    },
+    "INTP": {
+      "nickname": "The Thinker", 
+      "description": "INTPs are logical, innovative, and curious thinkers who love exploring theoretical concepts and understanding how things work. They are driven by a desire to understand the underlying principles of everything around them.",
+      "detailed_description": "INTPs are quiet, thoughtful, analytical individuals who don't find many companions who share their enthusiasm for idea generation. They are often perceived as being disorganized and random, but this is not always the case. They just don't see the value in organizing their environment if it doesn't serve a real purpose. INTPs are extremely loyal to their friends and family, and they can be very passionate about their causes.",
+      "strengths": [
+        "Logical reasoning and analytical thinking",
+        "Intellectual curiosity and love of learning",
+        "Objective analysis and problem-solving",
+        "Creative and innovative thinking",
+        "Independent and original"
+      ],
+      "challenges": [
+        "May neglect practical day-to-day matters",
+        "Difficulty expressing emotions and feelings",
+        "Can be insensitive to others' emotional needs",
+        "Tendency to procrastinate on routine tasks",
+        "May appear detached or disinterested"
+      ],
+      "cognitive_stack_explanation": "Your mind works through four main cognitive functions in this order:",
+      "dominant_function": "Ti - Your primary way of processing information is through Introverted Thinking, which gives you the ability to analyze information logically and create internal frameworks.",
+      "auxiliary_function": "Ne - Your supporting function is Extraverted Intuition, which helps you explore possibilities and generate new ideas.",
+      "tertiary_function": "Si - Your developing function is Introverted Sensing, which connects you to past experiences and details.",
+      "inferior_function": "Fe - Your least developed function is Extraverted Feeling, which can make social dynamics and group harmony challenging.",
+      "career_matches": [
+        "Software Developer",
+        "Research Scientist",
+        "Data Analyst", 
+        "University Professor",
+        "Philosopher",
+        "Technical Writer"
+      ],
+      "famous_examples": [
+        "Albert Einstein",
+        "Bill Gates",
+        "Abraham Lincoln",
+        "Charles Darwin",
+        "Marie Curie"
+      ],
+      "learn_more_url": "https://www.16personalities.com/intp-personality"
+    },
+    "ENTJ": {
+      "nickname": "The Commander",
+      "description": "ENTJs are bold, strategic, and natural-born leaders who excel at organizing people and resources to achieve ambitious goals. They are driven, decisive, and love taking charge of complex situations.",
+      "detailed_description": "ENTJs are natural leaders and are often found in leadership positions. They live in a world of possibilities where they see all sorts of challenges to be surmounted, and they want to be the ones responsible for surmounting them. They have a drive for leadership, which is well-served by their quickness to grasp complexities, their ability to absorb a large amount of objective information, and their quick and decisive judgments.",
+      "strengths": [
+        "Natural leadership and management skills",
+        "Strategic planning and long-term thinking",
+        "Efficient and results-oriented",
+        "Confident and decisive",
+        "Goal-oriented and ambitious"
+      ],
+      "challenges": [
+        "Can be impatient with inefficiency",
+        "May overlook people's feelings and emotions",
+        "Tendency to be domineering or controlling",
+        "Workaholic tendencies and burnout risk",
+        "May appear intimidating to others"
+      ],
+      "cognitive_stack_explanation": "Your mind works through four main cognitive functions in this order:",
+      "dominant_function": "Te - Your primary way of processing information is through Extraverted Thinking, which gives you the ability to organize and systematize the external world efficiently.",
+      "auxiliary_function": "Ni - Your supporting function is Introverted Intuition, which helps you see patterns and future possibilities.",
+      "tertiary_function": "Se - Your developing function is Extraverted Sensing, which connects you to immediate opportunities and experiences.",
+      "inferior_function": "Fi - Your least developed function is Introverted Feeling, which can make personal values and emotions challenging to navigate.",
+      "career_matches": [
+        "CEO/Executive",
+        "Management Consultant",
+        "Investment Banker",
+        "Attorney/Lawyer",
+        "Project Manager",
+        "Entrepreneur"
+      ],
+      "famous_examples": [
+        "Steve Jobs",
+        "Franklin D. Roosevelt",
+        "Margaret Thatcher",
+        "Napoleon Bonaparte",
+        "Gordon Ramsay"
+      ],
+      "learn_more_url": "https://www.16personalities.com/entj-personality"
+    },
+    "ENTP": {
+      "nickname": "The Debater",
+      "description": "ENTPs are innovative, enthusiastic, and strategic thinkers who thrive on intellectual challenges and generating creative solutions. They love exploring new ideas and possibilities.",
+      "detailed_description": "ENTPs are inspired innovators, motivated to find new solutions to intellectually challenging problems. They are curious and clever, and seek to comprehend the people, systems, and principles that surround them. Open-minded and unconventional, Visionaries want to analyze, understand, and influence other people.",
+      "strengths": [
+        "Creative and innovative thinking",
+        "Enthusiastic and energetic",
+        "Strategic and visionary",
+        "Adaptable and flexible",
+        "Excellent communication skills"
+      ],
+      "challenges": [
+        "Difficulty with routine and mundane tasks",
+        "May neglect important details",
+        "Can be argumentative and confrontational",
+        "Inconsistent follow-through on projects",
+        "May appear scattered or unfocused"
+      ],
+      "cognitive_stack_explanation": "Your mind works through four main cognitive functions in this order:",
+      "dominant_function": "Ne - Your primary way of processing information is through Extraverted Intuition, which gives you the ability to explore possibilities and generate ideas.",
+      "auxiliary_function": "Ti - Your supporting function is Introverted Thinking, which helps you analyze and evaluate ideas logically.",
+      "tertiary_function": "Fe - Your developing function is Extraverted Feeling, which connects you to others' emotions and social dynamics.",
+      "inferior_function": "Si - Your least developed function is Introverted Sensing, which can make attention to details and routine challenging.",
+      "career_matches": [
+        "Entrepreneur",
+        "Marketing Manager",
+        "Journalist",
+        "Lawyer",
+        "Psychologist",
+        "Inventor"
+      ],
+      "famous_examples": [
+        "Mark Twain",
+        "Walt Disney",
+        "Thomas Edison",
+        "Benjamin Franklin",
+        "Richard Feynman"
+      ],
+      "learn_more_url": "https://www.16personalities.com/entp-personality"
+    },
+    "INFJ": {
+      "nickname": "The Advocate",
+      "description": "INFJs are insightful, principled, and creative individuals with a unique ability to inspire and guide others toward meaningful goals. They are driven by their values and desire to make a positive impact.",
+      "detailed_description": "INFJs are creative nurturers with a strong sense of personal integrity and a drive to help others realize their potential. Creative and insightful, they inspire others with their clear convictions and passion for their beliefs. They are complex individuals who combine empathy with strategic thinking.",
+      "strengths": [
+        "Empathetic and understanding",
+        "Insightful and perceptive",
+        "Creative and imaginative",
+        "Decisive when values are involved",
+        "Altruistic and inspiring"
+      ],
+      "challenges": [
+        "Perfectionist tendencies",
+        "Overly sensitive to criticism",
+        "Reluctant to open up to others",
+        "Can burn out from helping others",
+        "May neglect their own needs"
+      ],
+      "cognitive_stack_explanation": "Your mind works through four main cognitive functions in this order:",
+      "dominant_function": "Ni - Your primary way of processing information is through Introverted Intuition, which gives you the ability to see patterns and future possibilities.",
+      "auxiliary_function": "Fe - Your supporting function is Extraverted Feeling, which helps you understand and respond to others' emotions.",
+      "tertiary_function": "Ti - Your developing function is Introverted Thinking, which helps you analyze and organize your insights.",
+      "inferior_function": "Se - Your least developed function is Extraverted Sensing, which can make you less aware of immediate physical details.",
+      "career_matches": [
+        "Counselor/Therapist",
+        "Writer/Author",
+        "Social Worker",
+        "Teacher/Professor",
+        "Psychologist",
+        "Human Rights Advocate"
+      ],
+      "famous_examples": [
+        "Martin Luther King Jr.",
+        "Nelson Mandela",
+        "Mother Teresa",
+        "Mahatma Gandhi",
+        "Carl Jung"
+      ],
+      "learn_more_url": "https://www.16personalities.com/infj-personality"
+    },
+    "INFP": {
+      "nickname": "The Mediator",
+      "description": "INFPs are idealistic, loyal, and creative individuals driven by their values and desire to make the world a better place. They seek authenticity and meaning in everything they do.",
+      "detailed_description": "INFPs are imaginative idealists, guided by their own core values and beliefs. To a Mediator, possibilities are paramount; the realities of the moment are only of passing concern. They see potential for a better future, and pursue truth and meaning with their own individual flair.",
+      "strengths": [
+        "Empathetic and compassionate",
+        "Creative and imaginative",
+        "Passionate about their values",
+        "Flexible and open-minded",
+        "Loyal and devoted"
+      ],
+      "challenges": [
+        "Overly idealistic expectations",
+        "May take things too personally",
+        "Difficulty with criticism",
+        "Can be impractical or unrealistic",
+        "Tendency to isolate when stressed"
+      ],
+      "cognitive_stack_explanation": "Your mind works through four main cognitive functions in this order:",
+      "dominant_function": "Fi - Your primary way of processing information is through Introverted Feeling, which gives you the ability to evaluate based on personal values and maintain inner harmony.",
+      "auxiliary_function": "Ne - Your supporting function is Extraverted Intuition, which helps you explore possibilities and creative ideas.",
+      "tertiary_function": "Si - Your developing function is Introverted Sensing, which connects you to past experiences and personal memories.",
+      "inferior_function": "Te - Your least developed function is Extraverted Thinking, which can make external organization and efficiency challenging.",
+      "career_matches": [
+        "Writer/Author",
+        "Artist/Designer",
+        "Counselor/Therapist",
+        "Social Worker",
+        "Journalist",
+        "Environmental Scientist"
+      ],
+      "famous_examples": [
+        "William Shakespeare",
+        "J.R.R. Tolkien",
+        "Vincent van Gogh",
+        "Johnny Depp",
+        "Kurt Cobain"
+      ],
+      "learn_more_url": "https://www.16personalities.com/infp-personality"
+    },
+    "ENFJ": {
+      "nickname": "The Protagonist",
+      "description": "ENFJs are charismatic, altruistic, and inspiring leaders with a natural gift for motivating others and building strong relationships. They are driven to help others reach their potential.",
+      "detailed_description": "ENFJs are natural-born leaders, full of passion and charisma. Forming around two percent of the population, they are oftentimes our politicians, our coaches and our teachers, reaching out and inspiring others to achieve and to do good in the world.",
+      "strengths": [
+        "Natural leadership abilities",
+        "Empathetic and understanding",
+        "Charismatic and inspiring",
+        "Altruistic and helpful",
+        "Excellent communication skills"
+      ],
+      "challenges": [
+        "Overly idealistic about people",
+        "Too selfless, neglecting own needs",
+        "Overly sensitive to criticism",
+        "Can be manipulative when stressed",
+        "Difficulty making tough decisions"
+      ],
+      "cognitive_stack_explanation": "Your mind works through four main cognitive functions in this order:",
+      "dominant_function": "Fe - Your primary way of processing information is through Extraverted Feeling, which gives you the ability to understand and respond to others' emotions.",
+      "auxiliary_function": "Ni - Your supporting function is Introverted Intuition, which helps you see patterns and future possibilities for people.",
+      "tertiary_function": "Se - Your developing function is Extraverted Sensing, which connects you to immediate experiences and opportunities.",
+      "inferior_function": "Ti - Your least developed function is Introverted Thinking, which can make impersonal analysis challenging.",
+      "career_matches": [
+        "Teacher/Professor",
+        "Counselor/Therapist",
+        "Social Worker",
+        "HR Manager",
+        "Public Relations",
+        "Life Coach"
+      ],
+      "famous_examples": [
+        "Oprah Winfrey",
+        "Barack Obama",
+        "Maya Angelou",
+        "John F. Kennedy",
+        "Malala Yousafzai"
+      ],
+      "learn_more_url": "https://www.16personalities.com/enfj-personality"
+    },
+    "ENFP": {
+      "nickname": "The Campaigner",
+      "description": "ENFPs are enthusiastic, creative, and people-focused individuals who excel at inspiring others and generating innovative ideas. They bring joy and excitement to every situation.",
+      "detailed_description": "ENFPs are people-centered creators with a focus on possibilities and a contagious enthusiasm for new ideas, people and activities. Energetic, warm, and passionate, ENFPs love to help other people explore their creative potential.",
+      "strengths": [
+        "Enthusiastic and energetic",
+        "Creative and innovative",
+        "People-focused and sociable",
+        "Adaptable and spontaneous",
+        "Inspiring and motivating"
+      ],
+      "challenges": [
+        "Difficulty focusing on details",
+        "Tendency to overthink situations",
+        "Get stressed easily under pressure",
+        "Highly emotional and sensitive",
+        "Poor long-term planning skills"
+      ],
+      "cognitive_stack_explanation": "Your mind works through four main cognitive functions in this order:",
+      "dominant_function": "Ne - Your primary way of processing information is through Extraverted Intuition, which gives you the ability to explore possibilities and generate ideas.",
+      "auxiliary_function": "Fi - Your supporting function is Introverted Feeling, which helps you evaluate based on personal values and authenticity.",
+      "tertiary_function": "Te - Your developing function is Extraverted Thinking, which helps you organize and systematize your ideas.",
+      "inferior_function": "Si - Your least developed function is Introverted Sensing, which can make attention to details and routine challenging.",
+      "career_matches": [
+        "Marketing Manager",
+        "Journalist",
+        "Actor/Performer",
+        "Teacher",
+        "Social Worker",
+        "Event Planner"
+      ],
+      "famous_examples": [
+        "Robin Williams",
+        "Ellen DeGeneres",
+        "Will Smith",
+        "Quentin Tarantino",
+        "Robert Downey Jr."
+      ],
+      "learn_more_url": "https://www.16personalities.com/enfp-personality"
+    },
+    "ISTJ": {
+      "nickname": "The Logistician",
+      "description": "ISTJs are practical, reliable, and methodical individuals who excel at organizing, planning, and ensuring everything runs smoothly. They value tradition, loyalty, and responsibility.",
+      "detailed_description": "ISTJs are responsible organizers, driven to create and enforce order within systems and institutions. They are neat and orderly, inside and out, and tend to have a procedure for everything they do. Reliable and dutiful, ISTJs want to uphold tradition and follow regulations.",
+      "strengths": [
+        "Responsible and reliable",
+        "Practical and realistic",
+        "Methodical and organized",
+        "Patient and persistent",
+        "Loyal and dutiful"
+      ],
+      "challenges": [
+        "Stubborn and inflexible",
+        "Insensitive to others' feelings",
+        "Always follow the rules",
+        "Judgmental of others",
+        "Resistant to change"
+      ],
+      "cognitive_stack_explanation": "Your mind works through four main cognitive functions in this order:",
+      "dominant_function": "Si - Your primary way of processing information is through Introverted Sensing, which gives you the ability to recall past experiences and maintain consistency.",
+      "auxiliary_function": "Te - Your supporting function is Extraverted Thinking, which helps you organize and systematize the external world.",
+      "tertiary_function": "Fi - Your developing function is Introverted Feeling, which connects you to your personal values.",
+      "inferior_function": "Ne - Your least developed function is Extraverted Intuition, which can make exploring new possibilities challenging.",
+      "career_matches": [
+        "Accountant",
+        "Engineer",
+        "Manager",
+        "Administrator",
+        "Auditor",
+        "Project Manager"
+      ],
+      "famous_examples": [
+        "George Washington",
+        "Warren Buffett",
+        "Condoleezza Rice",
+        "Jeff Bezos",
+        "Natalie Portman"
+      ],
+      "learn_more_url": "https://www.16personalities.com/istj-personality"
+    },
+    "ISFJ": {
+      "nickname": "The Protector",
+      "description": "ISFJs are caring, loyal, and detail-oriented individuals with a natural gift for supporting others and maintaining harmony. They are devoted to helping people in practical ways.",
+      "detailed_description": "ISFJs are industrious caretakers, loyal to traditions and organizations. They are practical, compassionate, and caring, and are motivated to provide for others and protect them from the perils of life.",
+      "strengths": [
+        "Supportive and caring",
+        "Reliable and patient",
+        "Imaginative and observant",
+        "Enthusiastic and loyal",
+        "Good practical skills"
+      ],
+      "challenges": [
+        "Humble and shy",
+        "Take things too personally",
+        "Repress their feelings",
+        "Overload themselves with work",
+        "Reluctant to change"
+      ],
+      "cognitive_stack_explanation": "Your mind works through four main cognitive functions in this order:",
+      "dominant_function": "Si - Your primary way of processing information is through Introverted Sensing, which gives you the ability to recall past experiences and maintain traditions.",
+      "auxiliary_function": "Fe - Your supporting function is Extraverted Feeling, which helps you understand and respond to others' emotions.",
+      "tertiary_function": "Ti - Your developing function is Introverted Thinking, which helps you analyze and organize information.",
+      "inferior_function": "Ne - Your least developed function is Extraverted Intuition, which can make exploring new possibilities challenging.",
+      "career_matches": [
+        "Nurse",
+        "Teacher",
+        "Social Worker",
+        "Administrator",
+        "Counselor",
+        "Human Resources"
+      ],
+      "famous_examples": [
+        "Mother Teresa",
+        "Kate Middleton",
+        "Jimmy Carter",
+        "Captain America",
+        "Selena Gomez"
+      ],
+      "learn_more_url": "https://www.16personalities.com/isfj-personality"
+    },
+    "ESTJ": {
+      "nickname": "The Executive",
+      "description": "ESTJs are organized, practical, and decisive individuals who excel at managing people and resources to achieve concrete results. They are natural administrators and leaders.",
+      "detailed_description": "ESTJs are representatives of tradition and order, utilizing their understanding of what is right, wrong and socially acceptable to bring families and communities together. Embracing the values of honesty, dedication and dignity, people with the Executive personality type are valued for their clear advice and guidance.",
+      "strengths": [
+        "Dedicated and strong-willed",
+        "Direct and honest",
+        "Loyal and patient",
+        "Enjoy creating order",
+        "Excellent organizers"
+      ],
+      "challenges": [
+        "Inflexible and stubborn",
+        "Uncomfortable with unconventional situations",
+        "Judgmental of others",
+        "Too focused on social status",
+        "Difficult to relax"
+      ],
+      "cognitive_stack_explanation": "Your mind works through four main cognitive functions in this order:",
+      "dominant_function": "Te - Your primary way of processing information is through Extraverted Thinking, which gives you the ability to organize and systematize the external world efficiently.",
+      "auxiliary_function": "Si - Your supporting function is Introverted Sensing, which helps you recall past experiences and maintain consistency.",
+      "tertiary_function": "Ne - Your developing function is Extraverted Intuition, which connects you to new possibilities and ideas.",
+      "inferior_function": "Fi - Your least developed function is Introverted Feeling, which can make personal values and emotions challenging.",
+      "career_matches": [
+        "Manager/Executive",
+        "Administrator",
+        "Sales Manager",
+        "Military Officer",
+        "Judge",
+        "Project Manager"
+      ],
+      "famous_examples": [
+        "Henry Ford",
+        "John D. Rockefeller",
+        "Frank Sinatra",
+        "Judge Judy",
+        "Vince Lombardi"
+      ],
+      "learn_more_url": "https://www.16personalities.com/estj-personality"
+    },
+    "ESFJ": {
+      "nickname": "The Consul",
+      "description": "ESFJs are caring, sociable, and helpful individuals who thrive on building relationships and creating harmony in their environment. They are natural supporters and team players.",
+      "detailed_description": "ESFJs are altruists, and they take seriously their responsibility to help and to do the right thing. Unlike Analysts, who tend to take a big picture view of things, Consuls are more concerned with day-to-day specifics and helping people in practical ways.",
+      "strengths": [
+        "Strong practical skills",
+        "Loyal and warm-hearted",
+        "Sensitive to others' needs",
+        "Good at connecting with others",
+        "Excellent team players"
+      ],
+      "challenges": [
+        "Worried about their social status",
+        "Inflexible in new situations",
+        "Reluctant to innovate or improvise",
+        "Vulnerable to criticism",
+        "Often too needy for approval"
+      ],
+      "cognitive_stack_explanation": "Your mind works through four main cognitive functions in this order:",
+      "dominant_function": "Fe - Your primary way of processing information is through Extraverted Feeling, which gives you the ability to understand and respond to others' emotions.",
+      "auxiliary_function": "Si - Your supporting function is Introverted Sensing, which helps you recall past experiences and maintain traditions.",
+      "tertiary_function": "Ne - Your developing function is Extraverted Intuition, which connects you to new possibilities and social connections.",
+      "inferior_function": "Ti - Your least developed function is Introverted Thinking, which can make impersonal analysis challenging.",
+      "career_matches": [
+        "Teacher",
+        "Nurse",
+        "Social Worker",
+        "Event Planner",
+        "HR Manager",
+        "Counselor"
+      ],
+      "famous_examples": [
+        "Taylor Swift",
+        "Bill Clinton",
+        "Jennifer Garner",
+        "Danny Glover",
+        "Mary Tyler Moore"
+      ],
+      "learn_more_url": "https://www.16personalities.com/esfj-personality"
+    },
+    "ISTP": {
+      "nickname": "The Virtuoso",
+      "description": "ISTPs are practical, observant, and adaptable individuals who excel at understanding how things work and solving practical problems. They are hands-on learners who value independence.",
+      "detailed_description": "ISTPs are observant artisans with an understanding of mechanics and an interest in troubleshooting. They approach their environments with a flexible logic, looking for practical solutions to the problems at hand. They are independent and adaptable, and typically interact with the world around them in a self-directed, spontaneous manner.",
+      "strengths": [
+        "Optimistic and energetic",
+        "Creative and practical",
+        "Spontaneous and rational",
+        "Know how to prioritize",
+        "Great in a crisis"
+      ],
+      "challenges": [
+        "Stubborn and insensitive",
+        "Private and reserved",
+        "Easily bored",
+        "Dislike long-term commitments",
+        "Risky behavior tendencies"
+      ],
+      "cognitive_stack_explanation": "Your mind works through four main cognitive functions in this order:",
+      "dominant_function": "Ti - Your primary way of processing information is through Introverted Thinking, which gives you the ability to analyze information logically and understand how things work.",
+      "auxiliary_function": "Se - Your supporting function is Extraverted Sensing, which helps you respond to immediate opportunities and experiences.",
+      "tertiary_function": "Ni - Your developing function is Introverted Intuition, which connects you to patterns and insights.",
+      "inferior_function": "Fe - Your least developed function is Extraverted Feeling, which can make social dynamics and group harmony challenging.",
+      "career_matches": [
+        "Engineer",
+        "Mechanic",
+        "Technician",
+        "Pilot",
+        "Carpenter",
+        "Software Developer"
+      ],
+      "famous_examples": [
+        "Clint Eastwood",
+        "Michael Jordan",
+        "Tiger Woods",
+        "Amelia Earhart",
+        "Steve Jobs"
+      ],
+      "learn_more_url": "https://www.16personalities.com/istp-personality"
+    },
+    "ISFP": {
+      "nickname": "The Adventurer",
+      "description": "ISFPs are artistic, gentle, and flexible individuals driven by their values and seeking authentic self-expression. They are sensitive artists who value beauty and harmony.",
+      "detailed_description": "ISFPs are gentle caretakers who live in the present moment and enjoy their surroundings with cheerful, low-key enthusiasm. They are flexible and spontaneous, and like to go with the flow to enjoy what life has to offer.",
+      "strengths": [
+        "Charming and friendly",
+        "Sensitive to others",
+        "Imaginative and artistic",
+        "Passionate and energetic",
+        "Curious and flexible"
+      ],
+      "challenges": [
+        "Fiercely independent",
+        "Unpredictable behavior",
+        "Easily stressed",
+        "Overly competitive",
+        "Fluctuating self-esteem"
+      ],
+      "cognitive_stack_explanation": "Your mind works through four main cognitive functions in this order:",
+      "dominant_function": "Fi - Your primary way of processing information is through Introverted Feeling, which gives you the ability to evaluate based on personal values and maintain inner harmony.",
+      "auxiliary_function": "Se - Your supporting function is Extraverted Sensing, which helps you respond to immediate experiences and opportunities.",
+      "tertiary_function": "Ni - Your developing function is Introverted Intuition, which connects you to patterns and insights.",
+      "inferior_function": "Te - Your least developed function is Extraverted Thinking, which can make external organization and efficiency challenging.",
+      "career_matches": [
+        "Artist/Designer",
+        "Musician",
+        "Photographer",
+        "Counselor",
+        "Teacher",
+        "Chef"
+      ],
+      "famous_examples": [
+        "Michael Jackson",
+        "Rihanna",
+        "Bob Dylan",
+        "Frida Kahlo",
+        "Avril Lavigne"
+      ],
+      "learn_more_url": "https://www.16personalities.com/isfp-personality"
+    },
+    "ESTP": {
+      "nickname": "The Entrepreneur",
+      "description": "ESTPs are energetic, practical, and adaptable individuals who thrive in dynamic environments and excel at seizing opportunities. They are natural performers and problem-solvers.",
+      "detailed_description": "ESTPs are energetic thrillseekers who are at their best when putting out fires, whether literal or metaphorical. They bring a sense of dynamic energy to their interactions with others and the world around them. They assess situations quickly and move adeptly to respond to immediate problems with practical solutions.",
+      "strengths": [
+        "Bold and rational",
+        "Practical and observant",
+        "Original and perceptive",
+        "Direct and sociable",
+        "Great people skills"
+      ],
+      "challenges": [
+        "Insensitive and impatient",
+        "Risk-prone behavior",
+        "Unstructured approach",
+        "May miss bigger picture",
+        "Defiant of rules"
+      ],
+      "cognitive_stack_explanation": "Your mind works through four main cognitive functions in this order:",
+      "dominant_function": "Se - Your primary way of processing information is through Extraverted Sensing, which gives you the ability to be present in the moment and respond to immediate opportunities.",
+      "auxiliary_function": "Ti - Your supporting function is Introverted Thinking, which helps you analyze information logically and make quick decisions.",
+      "tertiary_function": "Fe - Your developing function is Extraverted Feeling, which connects you to others' emotions and social dynamics.",
+      "inferior_function": "Ni - Your least developed function is Introverted Intuition, which can make long-term planning challenging.",
+      "career_matches": [
+        "Sales Manager",
+        "Entrepreneur",
+        "Police Officer",
+        "Paramedic",
+        "Coach",
+        "Real Estate Agent"
+      ],
+      "famous_examples": [
+        "Donald Trump",
+        "Madonna",
+        "Eddie Murphy",
+        "Bruce Willis",
+        "Samuel L. Jackson"
+      ],
+      "learn_more_url": "https://www.16personalities.com/estp-personality"
+    },
+    "ESFP": {
+      "nickname": "The Entertainer",
+      "description": "ESFPs are enthusiastic, spontaneous, and people-focused individuals who bring joy and excitement to every situation. They are natural performers who love making others happy.",
+      "detailed_description": "ESFPs are vivacious entertainers who charm and engage their surroundings. They are spontaneous, energetic, and fun-loving, and take pleasure in all around them: food, clothes, nature, animals, and especially people.",
+      "strengths": [
+        "Bold and beautiful",
+        "Original and aesthetic",
+        "Great people skills",
+        "Practical and observant",
+        "Excellent sense of style"
+      ],
+      "challenges": [
+        "Sensitive and emotional",
+        "Conflict-averse",
+        "Easily bored",
+        "Poor long-term planners",
+        "Unfocused approach"
+      ],
+      "cognitive_stack_explanation": "Your mind works through four main cognitive functions in this order:",
+      "dominant_function": "Se - Your primary way of processing information is through Extraverted Sensing, which gives you the ability to be present in the moment and enjoy immediate experiences.",
+      "auxiliary_function": "Fi - Your supporting function is Introverted Feeling, which helps you evaluate based on personal values and authenticity.",
+      "tertiary_function": "Te - Your developing function is Extraverted Thinking, which helps you organize and systematize when needed.",
+      "inferior_function": "Ni - Your least developed function is Introverted Intuition, which can make long-term planning and abstract thinking challenging.",
+      "career_matches": [
+        "Teacher",
+        "Actor/Performer",
+        "Event Planner",
+        "Social Worker",
+        "Photographer",
+        "Tour Guide"
+      ],
+      "famous_examples": [
+        "Marilyn Monroe",
+        "Elvis Presley",
+        "Justin Bieber",
+        "Katy Perry",
+        "Bill Cosby"
+      ],
+      "learn_more_url": "https://www.16personalities.com/esfp-personality"
+    }
+  }
+}
