@@ -1,11 +1,11 @@
-import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:animated_text_kit/animated_text_kit.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
-import '../widgets/plasma_renderer.dart';
 import '../widgets/animated_button.dart';
+import '../widgets/gradient_background.dart';
+import '../services/app_preferences.dart';
 
 class WelcomeHomeScreen extends StatefulWidget {
   const WelcomeHomeScreen({super.key});
@@ -16,88 +16,54 @@ class WelcomeHomeScreen extends StatefulWidget {
 
 class _WelcomeHomeScreenState extends State<WelcomeHomeScreen>
     with TickerProviderStateMixin {
-  late AnimationController _floatingController;
 
   @override
   void initState() {
     super.initState();
-    _floatingController = AnimationController(
-      duration: const Duration(milliseconds: 3000),
-      vsync: this,
-    )..repeat();
   }
 
-  @override
-  void dispose() {
-    _floatingController.dispose();
-    super.dispose();
-  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Container(
-        decoration: const BoxDecoration(
-          gradient: LinearGradient(
-            tileMode: TileMode.mirror,
-            begin: Alignment.topRight,
-            end: Alignment.bottomRight,
-            colors: [
-              Color(0xfff44336),
-              Color(0xff2196f3),
-            ],
-            stops: [0, 1],
-          ),
-        ),
-        child: Stack(
-          children: [
-            // Plasma Background
-            const PlasmaRenderer(
-              type: PlasmaType.infinity,
-              particles: 10,
-              color: Color(0x442eaeaa),
-              blur: 0.31,
-              size: 1,
-              speed: 1.86,
-              offset: 0,
-              blendMode: BlendMode.plus,
-              particleType: ParticleType.atlas,
-              variation1: 0,
-              variation2: 0,
-              variation3: 0,
-              rotation: 0,
-            ),
-            SafeArea(
-              child: SingleChildScrollView(
-                child: AnimationLimiter(
-                  child: Padding(
-                    padding: const EdgeInsets.all(24.0),
-                    child: Column(
-                      children: AnimationConfiguration.toStaggeredList(
-                        duration: const Duration(milliseconds: 600),
-                        childAnimationBuilder: (widget) => SlideAnimation(
-                          verticalOffset: 50.0,
-                          child: FadeInAnimation(
-                            child: widget,
-                          ),
-                        ),
-                        children: [
-                          const SizedBox(height: 40),
-                          _buildHeader(),
-                          const SizedBox(height: 50),
-                          _buildTestOptions(context),
-                          const SizedBox(height: 40),
-                          _buildHistorySection(context),
-                          const SizedBox(height: 40),
-                          _buildFeaturesSection(context),
-                        ],
+      body: GradientBackground(
+        child: SafeArea(
+          child: SingleChildScrollView(
+            child: AnimationLimiter(
+              child: Padding(
+                padding: const EdgeInsets.all(24.0),
+                child: Column(
+                  children: AnimationConfiguration.toStaggeredList(
+                    duration: const Duration(milliseconds: 600),
+                    childAnimationBuilder: (widget) => SlideAnimation(
+                      verticalOffset: 50.0,
+                      child: FadeInAnimation(
+                        child: widget,
                       ),
                     ),
+                    children: [
+                      const SizedBox(height: 40),
+                      _buildHeader(),
+                      const SizedBox(height: 50),
+                      _buildTestOptions(context),
+                      const SizedBox(height: 40),
+                      _buildHistorySection(context),
+                      const SizedBox(height: 40),
+                      _buildFeaturesSection(context),
+                    ],
                   ),
                 ),
               ),
             ),
-          ],
+          ),
+        ),
+      ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () => _showAnimationSettings(context),
+        backgroundColor: Colors.white.withOpacity(0.9),
+        child: const Icon(
+          Icons.settings,
+          color: Color(0xFF421DA9),
         ),
       ),
     );
@@ -106,42 +72,30 @@ class _WelcomeHomeScreenState extends State<WelcomeHomeScreen>
   Widget _buildHeader() {
     return Column(
       children: [
-        // App Logo with floating animation
-        AnimatedBuilder(
-          animation: _floatingController,
-          builder: (context, child) {
-            final value = _floatingController.value * 2 * math.pi;
-            return Transform.translate(
-              offset: Offset(0, 8 * math.sin(value)),
-              child: Transform.scale(
-                scale: 1.0 + 0.1 * math.cos(value * 1.5),
-                child: Container(
-                  width: 100,
-                  height: 100,
-                  decoration: BoxDecoration(
-                    color: Colors.white.withOpacity(0.15),
-                    borderRadius: BorderRadius.circular(25),
-                    border: Border.all(
-                      color: Colors.white.withOpacity(0.3),
-                      width: 2,
-                    ),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.white.withOpacity(0.2),
-                        blurRadius: 20,
-                        spreadRadius: 5,
-                      ),
-                    ],
-                  ),
-                  child: const Icon(
-                    Icons.psychology_outlined,
-                    size: 50,
-                    color: Colors.white,
-                  ),
-                ),
+        // App Logo
+        Container(
+          width: 100,
+          height: 100,
+          decoration: BoxDecoration(
+            color: Colors.white.withOpacity(0.15),
+            borderRadius: BorderRadius.circular(25),
+            border: Border.all(
+              color: Colors.white.withOpacity(0.3),
+              width: 2,
+            ),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.white.withOpacity(0.2),
+                blurRadius: 20,
+                spreadRadius: 5,
               ),
-            );
-          },
+            ],
+          ),
+          child: const Icon(
+            Icons.psychology_outlined,
+            size: 50,
+            color: Colors.white,
+          ),
         ),
         const SizedBox(height: 24),
         
@@ -599,6 +553,120 @@ class _WelcomeHomeScreenState extends State<WelcomeHomeScreen>
             ),
           );
         }),
+      ],
+    );
+  }
+
+  void _showAnimationSettings(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (context) => const _AnimationSettingsDialog(),
+    );
+  }
+}
+
+class _AnimationSettingsDialog extends StatefulWidget {
+  const _AnimationSettingsDialog();
+
+  @override
+  State<_AnimationSettingsDialog> createState() => _AnimationSettingsDialogState();
+}
+
+class _AnimationSettingsDialogState extends State<_AnimationSettingsDialog> {
+  bool _animationEnabled = true;
+  bool _simpleMode = false;
+  bool _isLoading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadSettings();
+  }
+
+  Future<void> _loadSettings() async {
+    try {
+      final animationEnabled = await AppPreferences.getBackgroundAnimationEnabled();
+      final simpleMode = await AppPreferences.getSimpleAnimationMode();
+      
+      if (mounted) {
+        setState(() {
+          _animationEnabled = animationEnabled;
+          _simpleMode = simpleMode;
+          _isLoading = false;
+        });
+      }
+    } catch (e) {
+      if (mounted) {
+        setState(() {
+          _animationEnabled = true;
+          _simpleMode = false;
+          _isLoading = false;
+        });
+      }
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return AlertDialog(
+      title: const Text(
+        'Animation Settings',
+        style: TextStyle(
+          fontWeight: FontWeight.bold,
+          color: Color(0xFF421DA9),
+        ),
+      ),
+      content: _isLoading
+          ? const Center(
+              child: CircularProgressIndicator(),
+            )
+          : Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                const Text(
+                  'Customize background animations for better performance',
+                  style: TextStyle(
+                    fontSize: 14,
+                    color: Colors.grey,
+                  ),
+                ),
+                const SizedBox(height: 20),
+                SwitchListTile(
+                  title: const Text('Background Animation'),
+                  subtitle: const Text('Enable fluid background animations'),
+                  value: _animationEnabled,
+                  onChanged: (value) async {
+                    await AppPreferences.setBackgroundAnimationEnabled(value);
+                    setState(() {
+                      _animationEnabled = value;
+                    });
+                  },
+                ),
+                if (_animationEnabled)
+                  SwitchListTile(
+                    title: const Text('Performance Mode'),
+                    subtitle: const Text('Use simplified animations for better performance'),
+                    value: _simpleMode,
+                    onChanged: (value) async {
+                      await AppPreferences.setSimpleAnimationMode(value);
+                      setState(() {
+                        _simpleMode = value;
+                      });
+                    },
+                  ),
+              ],
+            ),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.of(context).pop(),
+          child: const Text(
+            'Done',
+            style: TextStyle(
+              color: Color(0xFF421DA9),
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+        ),
       ],
     );
   }

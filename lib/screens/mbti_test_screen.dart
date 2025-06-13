@@ -4,7 +4,7 @@ import 'package:go_router/go_router.dart';
 import '../providers/mbti_personality_provider.dart';
 import '../widgets/animated_button.dart';
 import '../widgets/animated_question_card.dart';
-import '../widgets/plasma_renderer.dart';
+import '../widgets/gradient_background.dart';
 
 class MBTITestScreen extends StatefulWidget {
   const MBTITestScreen({super.key});
@@ -119,43 +119,10 @@ class _MBTITestScreenState extends State<MBTITestScreen>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: GestureDetector(
-        child: Container(
-          decoration: BoxDecoration(
-            gradient: LinearGradient(
-              tileMode: TileMode.mirror,
-              begin: Alignment.topRight,
-              end: Alignment.bottomRight,
-              colors: [
-                Color(0xfff44336),
-                Color(0xff2196f3),
-              ],
-              stops: [
-                0,
-                1,
-              ],
-            ),
-            backgroundBlendMode: BlendMode.srcOver,
-          ),
-          child: Stack(
-            children: [
-              PlasmaRenderer(
-                type: PlasmaType.infinity,
-                particles: 10,
-                color: Color(0x442eaeaa),
-                blur: 0.31,
-                size: 1,
-                speed: 1.86,
-                offset: 0,
-                blendMode: BlendMode.plus,
-                particleType: ParticleType.atlas,
-                variation1: 0,
-                variation2: 0,
-                variation3: 0,
-                rotation: 0,
-              ),
-              SafeArea(
-                child: Consumer<MBTIPersonalityProvider>(
+      body: GradientBackground(
+        child: GestureDetector(
+          child: SafeArea(
+            child: Consumer<MBTIPersonalityProvider>(
                   builder: (context, provider, child) {
                     // Safety check - show loading if provider is loading or not properly initialized
                     if (provider.isLoading || provider.questions.isEmpty) {
@@ -329,9 +296,7 @@ class _MBTITestScreenState extends State<MBTITestScreen>
                       ],
                     );
                   },
-                ),
-              ),
-            ],
+            ),
           ),
         ),
       ),
