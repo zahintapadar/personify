@@ -1,0 +1,53 @@
+{
+  "best_model_name": "Logistic Regression",
+  "best_accuracy": 0.7810920121334681,
+  "training_time": 2.86507511138916,
+  "prediction_time": 0.003879070281982422,
+  "label_classes": [
+    "ENFJ",
+    "ENFP",
+    "ENTJ",
+    "ENTP",
+    "ESFJ",
+    "ESFP",
+    "ESTJ",
+    "ESTP",
+    "INFJ",
+    "INFP",
+    "INTJ",
+    "INTP",
+    "ISFJ",
+    "ISFP",
+    "ISTJ",
+    "ISTP"
+  ],
+  "tfidf_max_features": 5000,
+  "test_samples": 1978,
+  "training_samples": 7908,
+  "all_results": [
+    {
+      "model_name": "Logistic Regression",
+      "accuracy": 0.7810920121334681,
+      "training_time": 2.86507511138916,
+      "prediction_time": 0.003879070281982422
+    },
+    {
+      "model_name": "Support Vector Machine",
+      "accuracy": 0.7669362992922144,
+      "training_time": 513.8489170074463,
+      "prediction_time": 18.215177059173584
+    },
+    {
+      "model_name": "Random Forest",
+      "accuracy": 0.6466127401415571,
+      "training_time": 2.0620179176330566,
+      "prediction_time": 0.03739118576049805
+    },
+    {
+      "model_name": "Naive Bayes",
+      "accuracy": 0.5904954499494439,
+      "training_time": 0.01862502098083496,
+      "prediction_time": 0.0030100345611572266
+    }
+  ]
+}

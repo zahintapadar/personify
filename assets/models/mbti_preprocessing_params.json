@@ -1,0 +1,25 @@
+{
+  "max_vocab_size": 3000,
+  "max_length": 100,
+  "embedding_dim": 128,
+  "label_classes": [
+    "ENFJ",
+    "ENFP",
+    "ENTJ",
+    "ENTP",
+    "ESFJ",
+    "ESFP",
+    "ESTJ",
+    "ESTP",
+    "INFJ",
+    "INFP",
+    "INTJ",
+    "INTP",
+    "ISFJ",
+    "ISFP",
+    "ISTJ",
+    "ISTP"
+  ],
+  "vocab_size": 3001,
+  "test_accuracy": 0.1032448410987854
+}
