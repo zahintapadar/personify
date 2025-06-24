@@ -21,13 +21,13 @@
     "ISTJ",
     "ISTP"
   ],
-  "test_accuracy": 0.5001599192619324,
-  "test_loss": 3.1932899951934814,
-  "test_top_3_accuracy": 0.7312120243044452,
-  "test_top_5_accuracy": 0.8386632555164695,
-  "best_val_accuracy": 0.5001599192619324,
-  "best_epoch": 7,
-  "training_time_seconds": 171.22154021263123,
+  "test_accuracy": 0.49792131781578064,
+  "test_loss": 3.1686861515045166,
+  "test_top_3_accuracy": 0.7315318196354333,
+  "test_top_5_accuracy": 0.8388231531819635,
+  "best_val_accuracy": 0.49856093525886536,
+  "best_epoch": 13,
+  "training_time_seconds": 169.91857409477234,
   "total_samples": 31266,
   "train_samples": 25012,
   "test_samples": 6254,
@@ -42,5 +42,5 @@
     "max_df": 0.9,
     "sublinear_tf": true
   },
-  "created_timestamp": 1749661680.844691
+  "created_timestamp": 1750709798.0944672
 }

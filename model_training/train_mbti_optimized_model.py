@@ -260,6 +260,11 @@ def main():
     
     # Load and preprocess data
     csv_path = '../lib/data/mbti_personality.csv'
+    if not os.path.exists(csv_path):
+        print(f"Error: Dataset file not found at {csv_path}")
+        print("Please ensure the MBTI dataset is available.")
+        return
+        
     texts, labels = load_and_preprocess_data(
         csv_path, 
         use_full_dataset=True,

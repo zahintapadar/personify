@@ -5,35 +5,49 @@ import '../models/personality_question.dart';
 import '../models/personality_result.dart';
 import '../services/ml_service.dart';
 import '../services/google_forms_service.dart';
+import '../services/supabase_service.dart';
 
 class PersonalityProvider extends ChangeNotifier {
   final MLService _mlService = MLService();
-  
+
   // Test state
   int _currentQuestionIndex = 0;
   final Map<String, dynamic> _answers = {};
   bool _isTestCompleted = false;
   PersonalityResult? _result;
   bool _isLoading = false;
-  
+  bool _isInitialized = false;
+
   // History state
   List<PersonalityResult> _testHistory = [];
   static const String _historyKey = 'personality_test_history';
-  
+
   // Questions for the personality test
   final List<PersonalityQuestion> _questions = [
     PersonalityQuestion(
       id: 'time_alone',
       title: 'Time Spent Alone',
       question: 'How much time do you prefer to spend alone?',
-      options: ['Very little', 'Some time', 'Moderate amount', 'Quite a bit', 'A lot'],
+      options: [
+        'Very little',
+        'Some time',
+        'Moderate amount',
+        'Quite a bit',
+        'A lot',
+      ],
       values: [1, 2, 3, 4, 5],
     ),
     PersonalityQuestion(
       id: 'stage_fear',
       title: 'Stage Fear',
       question: 'How comfortable are you speaking in front of groups?',
-      options: ['Very comfortable', 'Somewhat comfortable', 'Neutral', 'Somewhat uncomfortable', 'Very uncomfortable'],
+      options: [
+        'Very comfortable',
+        'Somewhat comfortable',
+        'Neutral',
+        'Somewhat uncomfortable',
+        'Very uncomfortable',
+      ],
       values: [1, 2, 3, 4, 5],
     ),
     PersonalityQuestion(
@@ -54,7 +68,13 @@ class PersonalityProvider extends ChangeNotifier {
       id: 'drained_socializing',
       title: 'Energy After Socializing',
       question: 'How do you feel after socializing for a long time?',
-      options: ['Energized', 'Slightly energized', 'Neutral', 'Slightly drained', 'Very drained'],
+      options: [
+        'Energized',
+        'Slightly energized',
+        'Neutral',
+        'Slightly drained',
+        'Very drained',
+      ],
       values: [1, 2, 3, 4, 5],
     ),
     PersonalityQuestion(
@@ -68,53 +88,68 @@ class PersonalityProvider extends ChangeNotifier {
       id: 'post_frequency',
       title: 'Social Media Posting',
       question: 'How often do you post on social media?',
-      options: ['Very frequently', 'Frequently', 'Sometimes', 'Rarely', 'Never'],
+      options: [
+        'Very frequently',
+        'Frequently',
+        'Sometimes',
+        'Rarely',
+        'Never',
+      ],
       values: [5, 4, 3, 2, 1],
     ),
   ];
-  
+
   // Getters
   int get currentQuestionIndex => _currentQuestionIndex;
   Map<String, dynamic> get answers => _answers;
   bool get isTestCompleted => _isTestCompleted;
   PersonalityResult? get result => _result;
   bool get isLoading => _isLoading;
+  bool get isInitialized => _isInitialized;
   List<PersonalityQuestion> get questions => _questions;
   PersonalityQuestion get currentQuestion => _questions[_currentQuestionIndex];
   double get progress => (_currentQuestionIndex + 1) / _questions.length;
   bool get hasNextQuestion => _currentQuestionIndex < _questions.length - 1;
   bool get hasPreviousQuestion => _currentQuestionIndex > 0;
   List<PersonalityResult> get testHistory => _testHistory;
-  
+
   // Get ML service status
   bool get isMLServiceReady => _mlService.isInitialized;
-  String get mlServiceStatus => _mlService.isInitialized ? 'Ready' : 'Not Available';
-  
+  String get mlServiceStatus =>
+      _mlService.isInitialized ? 'Ready' : 'Not Available';
+
   // Initialize ML service
   Future<void> initializeML() async {
+    if (_isInitialized) return; // Prevent multiple initializations
+
     _isLoading = true;
     notifyListeners();
-    
+
     try {
       debugPrint('Initializing ML service...');
       await _mlService.initialize();
       await _loadTestHistory(); // Load saved history
-      debugPrint('ML Service initialization completed. Status: ${_mlService.isInitialized}');
+      debugPrint(
+        'ML Service initialization completed. Status: ${_mlService.isInitialized}',
+      );
     } catch (e) {
       debugPrint('Error initializing ML service: $e');
       // Continue without ML service - fallback algorithm will be used
     }
-    
+
+    _isInitialized = true;
     _isLoading = false;
     notifyListeners();
   }
-  
+
   // Manually retry ML service initialization
   Future<bool> retryMLInitialization() async {
     try {
       debugPrint('Retrying ML service initialization...');
       await _mlService.initialize();
-      debugPrint('ML Service retry completed. Status: ${_mlService.isInitialized}');
+      debugPrint(
+        'ML Service retry completed. Status: ${_mlService.isInitialized}',
+      );
       notifyListeners();
       return _mlService.isInitialized;
     } catch (e) {
@@ -122,13 +157,13 @@ class PersonalityProvider extends ChangeNotifier {
       return false;
     }
   }
-  
+
   // Answer a question
   void answerQuestion(String questionId, int value) {
     _answers[questionId] = value;
     notifyListeners();
   }
-  
+
   // Navigate to next question
   void nextQuestion() {
     if (hasNextQuestion && _currentQuestionIndex < _questions.length - 1) {
@@ -136,7 +171,7 @@ class PersonalityProvider extends ChangeNotifier {
       notifyListeners();
     }
   }
-  
+
   // Navigate to previous question
   void previousQuestion() {
     if (hasPreviousQuestion && _currentQuestionIndex > 0) {
@@ -144,16 +179,18 @@ class PersonalityProvider extends ChangeNotifier {
       notifyListeners();
     }
   }
-  
+
   // Complete the test and get results
   Future<void> completeTest() async {
     if (_answers.length != _questions.length) {
-      throw Exception('Please answer all questions before completing the test.');
+      throw Exception(
+        'Please answer all questions before completing the test.',
+      );
     }
-    
+
     _isLoading = true;
     notifyListeners();
-    
+
     try {
       // Prepare input for ML model (all values should be 1-5 scale)
       List<double> input = [
@@ -165,12 +202,12 @@ class PersonalityProvider extends ChangeNotifier {
         _answers['friends_circle']?.toDouble() ?? 0.0,
         _answers['post_frequency']?.toDouble() ?? 0.0,
       ];
-      
+
       debugPrint('Processing personality test with input: $input');
-      
+
       double prediction;
       String predictionSource = 'ML Model';
-      
+
       // Try to get prediction from ML model
       if (_mlService.isInitialized) {
         try {
@@ -187,13 +224,15 @@ class PersonalityProvider extends ChangeNotifier {
         prediction = _calculateFallbackPrediction(input);
         predictionSource = 'Fallback Algorithm';
       }
-      
+
       // Determine personality type and confidence
       String personalityType = prediction > 0.5 ? 'Extrovert' : 'Introvert';
       double confidence = prediction > 0.5 ? prediction : (1 - prediction);
-      
-      debugPrint('Final prediction: $prediction, Type: $personalityType, Confidence: ${(confidence * 100).toInt()}%, Source: $predictionSource');
-      
+
+      debugPrint(
+        'Final prediction: $prediction, Type: $personalityType, Confidence: ${(confidence * 100).toInt()}%, Source: $predictionSource',
+      );
+
       // Create result
       _result = PersonalityResult(
         personalityType: personalityType,
@@ -204,31 +243,34 @@ class PersonalityProvider extends ChangeNotifier {
         tips: _getPersonalityTips(personalityType),
         answers: Map.from(_answers),
       );
-      
+
       _isTestCompleted = true;
-      
+
       // Save to history
       await _saveTestToHistory(_result!);
-      
+
       // Submit to Google Forms (non-blocking)
       _submitToGoogleForms(_result!, _answers);
-      
+
+      // Submit to Supabase (non-blocking)
+      _submitToSupabase(_result!, _answers);
+
       debugPrint('Test completed successfully and saved to history');
     } catch (e) {
       debugPrint('Error completing test: $e');
       rethrow;
     }
-    
+
     _isLoading = false;
     notifyListeners();
   }
-  
+
   // Load test history from SharedPreferences
   Future<void> _loadTestHistory() async {
     try {
       final prefs = await SharedPreferences.getInstance();
       final historyJson = prefs.getString(_historyKey);
-      
+
       if (historyJson != null) {
         final historyList = jsonDecode(historyJson) as List;
         _testHistory = historyList
@@ -241,7 +283,7 @@ class PersonalityProvider extends ChangeNotifier {
       _testHistory = [];
     }
   }
-  
+
   // Save test result to history
   Future<void> _saveTestToHistory(PersonalityResult result) async {
     try {
@@ -256,25 +298,29 @@ class PersonalityProvider extends ChangeNotifier {
         answers: result.answers,
         timestamp: DateTime.now(), // Add timestamp
       );
-      
+
       _testHistory.insert(0, resultWithTimestamp); // Add to beginning
-      
+
       // Keep only last 10 results
       if (_testHistory.length > 10) {
         _testHistory = _testHistory.take(10).toList();
       }
-      
+
       // Save to SharedPreferences
       final prefs = await SharedPreferences.getInstance();
-      final historyJson = jsonEncode(_testHistory.map((r) => r.toJson()).toList());
+      final historyJson = jsonEncode(
+        _testHistory.map((r) => r.toJson()).toList(),
+      );
       await prefs.setString(_historyKey, historyJson);
-      
-      debugPrint('Saved test result to history. Total results: ${_testHistory.length}');
+
+      debugPrint(
+        'Saved test result to history. Total results: ${_testHistory.length}',
+      );
     } catch (e) {
       debugPrint('Error saving test to history: $e');
     }
   }
-  
+
   // Clear test history
   Future<void> clearTestHistory() async {
     try {
@@ -289,30 +335,54 @@ class PersonalityProvider extends ChangeNotifier {
   }
 
   // Submit results to Google Forms (non-blocking)
-  void _submitToGoogleForms(PersonalityResult result, Map<String, dynamic> answers) {
+  void _submitToGoogleForms(
+    PersonalityResult result,
+    Map<String, dynamic> answers,
+  ) {
     // Run submission in background without blocking UI
     GoogleFormsService.submitTestResults(
-      result: result,
-      answers: answers,
-      questions: _questions, // Pass questions for option text mapping
-    ).then((success) {
-      if (success) {
-        debugPrint('Successfully submitted test results to Google Forms');
-      } else {
-        debugPrint('Failed to submit test results to Google Forms');
-      }
-    }).catchError((error) {
-      debugPrint('Error submitting to Google Forms: $error');
-    });
+          result: result,
+          answers: answers,
+          questions: _questions, // Pass questions for option text mapping
+        )
+        .then((success) {
+          if (success) {
+            debugPrint('Successfully submitted test results to Google Forms');
+          } else {
+            debugPrint('Failed to submit test results to Google Forms');
+          }
+        })
+        .catchError((error) {
+          debugPrint('Error submitting to Google Forms: $error');
+        });
   }
-  
+
+  // Submit results to Supabase (non-blocking)
+  void _submitToSupabase(
+    PersonalityResult result,
+    Map<String, dynamic> answers,
+  ) {
+    // Run submission in background without blocking UI
+    SupabaseService.submitPersonalityTest(result: result, answers: answers)
+        .then((success) {
+          if (success) {
+            debugPrint('Successfully submitted test results to Supabase');
+          } else {
+            debugPrint('Failed to submit test results to Supabase');
+          }
+        })
+        .catchError((error) {
+          debugPrint('Error submitting to Supabase: $error');
+        });
+  }
+
   // Set a historical result as current (for viewing details)
   void setHistoricalResult(PersonalityResult result) {
     _result = result;
     _isTestCompleted = true;
     notifyListeners();
   }
-  
+
   // Fallback prediction when ML model is not available
   double _calculateFallbackPrediction(List<double> input) {
     // Simple heuristic based on question answers
@@ -321,12 +391,13 @@ class PersonalityProvider extends ChangeNotifier {
     double stageFear = input[1]; // 1-5, higher = more fear (introvert)
     double socialEvents = input[2]; // 1-5, higher = more social (extrovert)
     double goingOutside = input[3]; // 1-5, higher = more active (extrovert)
-    double drainedSocializing = input[4]; // 1-5, higher = more drained (introvert)
+    double drainedSocializing =
+        input[4]; // 1-5, higher = more drained (introvert)
     double friendsCircle = input[5]; // 1-5, higher = larger circle (extrovert)
     double postFrequency = input[6]; // 1-5, higher = more posts (extrovert)
-    
+
     // Calculate weighted score (higher = more extroverted)
-    double extrovertScore = 
+    double extrovertScore =
         (6 - timeAlone) * 0.2 + // Invert time alone
         (6 - stageFear) * 0.15 + // Invert stage fear
         socialEvents * 0.2 +
@@ -334,17 +405,20 @@ class PersonalityProvider extends ChangeNotifier {
         (6 - drainedSocializing) * 0.15 + // Invert drained feeling
         friendsCircle * 0.1 +
         postFrequency * 0.05;
-    
+
     // Normalize to 0-1 range
-    double normalizedScore = (extrovertScore - 1) / 4; // Assuming max possible is 5, min is 1
-    
+    double normalizedScore =
+        (extrovertScore - 1) / 4; // Assuming max possible is 5, min is 1
+
     // Ensure it's within bounds and add slight variance for realism
     normalizedScore = (normalizedScore.clamp(0.0, 1.0) * 0.8 + 0.1);
-    
-    debugPrint('Fallback prediction calculated: $normalizedScore for input: $input');
+
+    debugPrint(
+      'Fallback prediction calculated: $normalizedScore for input: $input',
+    );
     return normalizedScore;
   }
-  
+
   // Reset the test
   void resetTest() {
     _currentQuestionIndex = 0;
@@ -353,7 +427,7 @@ class PersonalityProvider extends ChangeNotifier {
     _result = null;
     notifyListeners();
   }
-  
+
   // Get personality description
   String _getPersonalityDescription(String personalityType) {
     if (personalityType == 'Extrovert') {
@@ -362,7 +436,7 @@ class PersonalityProvider extends ChangeNotifier {
       return 'You are energized by solitude and tend to be reflective, reserved, and thoughtful. You prefer smaller groups and often enjoy quiet activities.';
     }
   }
-  
+
   // Get personality traits
   List<String> _getPersonalityTraits(String personalityType) {
     if (personalityType == 'Extrovert') {
@@ -385,7 +459,7 @@ class PersonalityProvider extends ChangeNotifier {
       ];
     }
   }
-  
+
   // Get personality strengths
   List<String> _getPersonalityStrengths(String personalityType) {
     if (personalityType == 'Extrovert') {
@@ -408,7 +482,7 @@ class PersonalityProvider extends ChangeNotifier {
       ];
     }
   }
-  
+
   // Get personality tips
   List<String> _getPersonalityTips(String personalityType) {
     if (personalityType == 'Extrovert') {
@@ -431,7 +505,7 @@ class PersonalityProvider extends ChangeNotifier {
       ];
     }
   }
-  
+
   @override
   void dispose() {
     _mlService.dispose();
