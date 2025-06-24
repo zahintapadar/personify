@@ -11,7 +11,7 @@ publish_to: 'none' # Remove this line if you wish to publish to pub.dev
 # build by specifying --build-name and --build-number, respectively.
 # In Android, build-name is used as versionName while build-number used as versionCode.
 # Read more about Android versioning at https://developer.android.com/studio/publish/versioning
-version: 2.0.0+1
+version: 2.1.0+3
 
 environment:
   sdk: ^3.8.1
@@ -51,6 +51,21 @@ dependencies:
   
   # For HTTP requests to Google Forms
   http: ^1.2.1
+  
+  # For notifications
+  flutter_local_notifications: ^17.2.1+2
+  
+  # For requesting permissions
+  permission_handler: ^11.3.1
+  
+  # For timezone support in notifications
+  timezone: ^0.9.4
+  
+  # For Supabase backend integration
+  supabase_flutter: ^2.5.6
+  
+  # For background music
+  audioplayers: ^6.1.0
   
   # For screenshot and sharing functionality
   screenshot: ^3.0.0
@@ -94,6 +109,7 @@ flutter:
   assets:
     - assets/models/
     - assets/data/
+    - assets/audio/
     - LogoTransparent.jpg
 
   # An image asset can refer to one or more resolution-specific "variants", see

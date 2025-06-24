@@ -7,8 +7,25 @@ import '../providers/mbti_personality_provider.dart';
 import '../widgets/gradient_background.dart';
 import '../models/mbti_personality_result.dart';
 
-class MBTIHistoryScreen extends StatelessWidget {
+class MBTIHistoryScreen extends StatefulWidget {
   const MBTIHistoryScreen({super.key});
+
+  @override
+  State<MBTIHistoryScreen> createState() => _MBTIHistoryScreenState();
+}
+
+class _MBTIHistoryScreenState extends State<MBTIHistoryScreen> {
+  @override
+  void initState() {
+    super.initState();
+    // Ensure provider is initialized when history screen is accessed
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final provider = Provider.of<MBTIPersonalityProvider>(context, listen: false);
+      if (!provider.isInitialized) {
+        provider.initializeML();
+      }
+    });
+  }
 
   @override
   Widget build(BuildContext context) {

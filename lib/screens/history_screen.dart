@@ -7,8 +7,25 @@ import '../providers/personality_provider.dart';
 import '../widgets/gradient_background.dart';
 import '../models/personality_result.dart';
 
-class HistoryScreen extends StatelessWidget {
+class HistoryScreen extends StatefulWidget {
   const HistoryScreen({super.key});
+
+  @override
+  State<HistoryScreen> createState() => _HistoryScreenState();
+}
+
+class _HistoryScreenState extends State<HistoryScreen> {
+  @override
+  void initState() {
+    super.initState();
+    // Ensure provider is initialized when history screen is accessed
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final provider = Provider.of<PersonalityProvider>(context, listen: false);
+      if (!provider.isInitialized) {
+        provider.initializeML();
+      }
+    });
+  }
 
   @override
   Widget build(BuildContext context) {

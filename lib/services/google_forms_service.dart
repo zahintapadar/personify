@@ -25,8 +25,7 @@ class GoogleFormsService {
     'q12': 'entry.1482226697',                 // Question 12 answer
     'q13': 'entry.2121172533',                 // Question 13 answer
     'q14': 'entry.164370552',                  // Question 14 answer
-    'q15': 'entry.784863944',                  // Question 15 answer
-    'q16': 'entry.146257679',                  // Question 16 answer (if exists)
+    'q15': 'entry.784863944'                   // Question 15 answer           
   };
 
   /// Submit personality test results to Google Forms
