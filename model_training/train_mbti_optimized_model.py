@@ -167,31 +167,32 @@ def create_optimized_model(input_dim, num_classes):
     print(f"Creating optimized model with input_dim={input_dim}, num_classes={num_classes}")
     
     model = tf.keras.Sequential([
-        tf.keras.layers.Dense(512, activation='relu', input_shape=(input_dim,), 
-                             kernel_regularizer=tf.keras.regularizers.l2(0.0002)),
+        # Input layer with strong regularization
+        tf.keras.layers.Dense(256, activation='relu', input_shape=(input_dim,), 
+                             kernel_regularizer=tf.keras.regularizers.l2(0.001)),
         tf.keras.layers.BatchNormalization(),
-        tf.keras.layers.Dropout(0.5),
+        tf.keras.layers.Dropout(0.6),  # Increased dropout
         
-        tf.keras.layers.Dense(256, activation='relu', 
-                             kernel_regularizer=tf.keras.regularizers.l2(0.0002)),
-        tf.keras.layers.BatchNormalization(),
-        tf.keras.layers.Dropout(0.4),
-        
+        # Hidden layer 1 - reduced size
         tf.keras.layers.Dense(128, activation='relu', 
-                             kernel_regularizer=tf.keras.regularizers.l2(0.0002)),
+                             kernel_regularizer=tf.keras.regularizers.l2(0.001)),
         tf.keras.layers.BatchNormalization(),
-        tf.keras.layers.Dropout(0.3),
+        tf.keras.layers.Dropout(0.5),  # Increased dropout
         
+        # Hidden layer 2 - smaller
         tf.keras.layers.Dense(64, activation='relu', 
-                             kernel_regularizer=tf.keras.regularizers.l2(0.0002)),
-        tf.keras.layers.BatchNormalization(),
-        tf.keras.layers.Dropout(0.2),
+                             kernel_regularizer=tf.keras.regularizers.l2(0.001)),
+        tf.keras.layers.BatchNormalization(), 
+        tf.keras.layers.Dropout(0.4),  # Increased dropout
         
+        # Output layer
         tf.keras.layers.Dense(num_classes, activation='softmax')
     ])
+    
+    # Use lower learning rate for better convergence
     model.compile(
         optimizer=tf.keras.optimizers.Adam(
-            learning_rate=0.0005,
+            learning_rate=0.0003,  # Lower learning rate
             beta_1=0.9,
             beta_2=0.999,
             epsilon=1e-07
@@ -204,11 +205,11 @@ def create_optimized_model(input_dim, num_classes):
 def main():
     start_time = time.time()
     
-    # Configuration for extremely accurate optimized model
-    MAX_FEATURES = 15000       # Optimal feature count for accuracy vs speed
-    BATCH_SIZE = 64            # Smaller batch size for better convergence
-    EPOCHS = 30               # More epochs for deeper learning
-    MAX_SAMPLES_PER_CLASS = 3000  # More samples per class for better learning
+    # Configuration for better generalization (anti-overfitting)
+    MAX_FEATURES = 10000       # More features for better representation
+    BATCH_SIZE = 128           # Larger batch size for more stable gradients
+    EPOCHS = 25               # Reduced epochs to prevent overfitting
+    MAX_SAMPLES_PER_CLASS = 2500  # Slightly reduced for balance
     
     print("=== Optimized TensorFlow MBTI Classification Model (M4 Mac) ===")
     print(f"Configuration:")
@@ -238,15 +239,25 @@ def main():
     print(f"\nLabel encoding:")
     print(f"  • Classes: {label_encoder.classes_}")
     print(f"  • Number of classes: {len(label_encoder.classes_)}")
-    # Split data with stratification
-    X_train, X_test, y_train, y_test = train_test_split(
+    # Split data with stratification - using validation split
+    X_train_full, X_test, y_train_full, y_test = train_test_split(
         X_tfidf, y_encoded,
         test_size=0.2,
         random_state=42,
         stratify=y_encoded
     )
+    
+    # Further split training data for validation
+    X_train, X_val, y_train, y_val = train_test_split(
+        X_train_full, y_train_full,
+        test_size=0.2,  # 20% of training data for validation
+        random_state=42,
+        stratify=y_train_full
+    )
+    
     print(f"\nDataset split:")
     print(f"  • Training samples: {X_train.shape[0]}")
+    print(f"  • Validation samples: {X_val.shape[0]}")
     print(f"  • Test samples: {X_test.shape[0]}")
     print(f"  • Feature dimensions: {X_train.shape[1]}")
     # Calculate balanced class weights
@@ -262,19 +273,19 @@ def main():
     model = create_optimized_model(X_train.shape[1], len(label_encoder.classes_))
     print(f"\nModel architecture:")
     model.summary()
-    # Enhanced training callbacks for better accuracy
+    # Enhanced training callbacks for better generalization
     callbacks = [
         tf.keras.callbacks.EarlyStopping(
             monitor='val_accuracy',
-            patience=15,  # More patience for better convergence
+            patience=10,  # Reduced patience to prevent overfitting
             restore_best_weights=True,
             verbose=1,
-            min_delta=0.0005
+            min_delta=0.001  # Larger min_delta for more stability
         ),
         tf.keras.callbacks.ReduceLROnPlateau(
             monitor='val_loss',
-            factor=0.3,  # More aggressive learning rate reduction
-            patience=7,
+            factor=0.5,  # Less aggressive LR reduction
+            patience=5,   # Faster response
             min_lr=0.00001,
             verbose=1
         ),
@@ -292,13 +303,30 @@ def main():
         X_train, y_train,
         batch_size=BATCH_SIZE,
         epochs=EPOCHS,
-        validation_data=(X_test, y_test),
+        validation_data=(X_val, y_val),  # Use separate validation set
         class_weight=class_weight_dict,
         callbacks=callbacks,
         verbose=1
     )
     training_time = time.time() - training_start
     print(f"\nTraining completed in {training_time:.2f} seconds")
+    
+    # Check for overfitting by comparing training vs validation performance
+    final_train_acc = history.history['accuracy'][-1]
+    final_val_acc = history.history['val_accuracy'][-1]
+    overfitting_gap = final_train_acc - final_val_acc
+    
+    print(f"\nOverfitting Analysis:")
+    print(f"  • Final Training Accuracy: {final_train_acc:.4f} ({final_train_acc:.2%})")
+    print(f"  • Final Validation Accuracy: {final_val_acc:.4f} ({final_val_acc:.2%})")
+    print(f"  • Overfitting Gap: {overfitting_gap:.4f} ({overfitting_gap:.2%})")
+    
+    if overfitting_gap > 0.1:
+        print(f"  ⚠️  WARNING: Significant overfitting detected!")
+    elif overfitting_gap > 0.05:
+        print(f"  📊 Moderate overfitting - consider more regularization")
+    else:
+        print(f"  ✅ Good generalization - overfitting is under control")
     
     # Evaluate model
     print(f"\\nEvaluating optimized model...")

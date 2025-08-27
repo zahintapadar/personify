@@ -1,10 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:go_router/go_router.dart';
+import 'package:google_fonts/google_fonts.dart';
 import '../providers/mbti_personality_provider.dart';
-import '../widgets/animated_button.dart';
-import '../widgets/animated_question_card.dart';
-import '../widgets/gradient_background.dart';
+import '../widgets/simple_button.dart';
 
 class MBTITestScreen extends StatefulWidget {
   const MBTITestScreen({super.key});
@@ -13,14 +12,12 @@ class MBTITestScreen extends StatefulWidget {
   State<MBTITestScreen> createState() => _MBTITestScreenState();
 }
 
-class _MBTITestScreenState extends State<MBTITestScreen>
-    with TickerProviderStateMixin {
+class _MBTITestScreenState extends State<MBTITestScreen> {
   int? _selectedOptionIndex;
 
   @override
   void initState() {
     super.initState();
-    // Use post frame callback to avoid setState during build
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _initializeProvider();
     });
@@ -28,15 +25,10 @@ class _MBTITestScreenState extends State<MBTITestScreen>
 
   void _initializeProvider() async {
     final provider = Provider.of<MBTIPersonalityProvider>(context, listen: false);
-    
-    // Always reset test when entering test screen to ensure fresh start
     provider.resetTest();
-    
-    // Initialize ML service if not already initialized
     if (!provider.isLoading) {
       await provider.initializeML();
     }
-    
     _initializeCurrentAnswer();
   }
 
@@ -50,254 +42,275 @@ class _MBTITestScreenState extends State<MBTITestScreen>
         setState(() {
           _selectedOptionIndex = existingAnswer;
         });
-      } else {
-        setState(() {
-          _selectedOptionIndex = null;
-        });
       }
     } catch (e) {
       debugPrint('Error initializing current answer: $e');
     }
   }
 
-  void _nextQuestion() {
+  void _selectOption(int index) {
+    setState(() {
+      _selectedOptionIndex = index;
+    });
+    
     final provider = Provider.of<MBTIPersonalityProvider>(context, listen: false);
-    final currentQuestion = provider.currentQuestion;
+    provider.answerQuestion(provider.currentQuestion.id, index);
+  }
+
+  void _nextQuestion() async {
+    if (_selectedOptionIndex == null) return;
     
-    // Save current answer - MCQ uses index of selected option
-    if (_selectedOptionIndex != null) {
-      provider.answerQuestion(currentQuestion.id, _selectedOptionIndex!);
-    }
+    final provider = Provider.of<MBTIPersonalityProvider>(context, listen: false);
     
-    if (provider.hasNextQuestion) {
-      provider.nextQuestion();
-      _initializeCurrentAnswer();
-    } else {
-      _completeTest();
+    try {
+      if (provider.hasNextQuestion) {
+        provider.nextQuestion();
+        // Clear selection for new question instead of initializing with previous answer
+        setState(() {
+          _selectedOptionIndex = null;
+        });
+      } else {
+        await provider.completeTest();
+        if (mounted) {
+          context.push('/mbti-results');
+        }
+      }
+    } catch (e) {
+      debugPrint('Error in next question: $e');
     }
   }
 
   void _previousQuestion() {
     final provider = Provider.of<MBTIPersonalityProvider>(context, listen: false);
-    
     if (provider.hasPreviousQuestion) {
       provider.previousQuestion();
+      // For previous questions, we can show the existing answer since user might want to review/change it
       _initializeCurrentAnswer();
     }
   }
 
-  void _completeTest() async {
-    final provider = Provider.of<MBTIPersonalityProvider>(context, listen: false);
-    
-    try {
-      debugPrint('Starting MBTI test completion...');
-      await provider.completeTest();
-      debugPrint('MBTI test completion successful!');
-      
-      if (mounted) {
-        debugPrint('Navigating to MBTI results...');
-        context.go('/mbti-results');
-      }
-    } catch (e) {
-      debugPrint('Error completing MBTI test: $e');
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Error completing test: ${e.toString()}'),
-            backgroundColor: Colors.red,
-            behavior: SnackBarBehavior.floating,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(12),
-            ),
-          ),
-        );
-      }
-    }
-  }
-
-
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    
     return Scaffold(
-      body: GradientBackground(
-        child: GestureDetector(
-          child: SafeArea(
-            child: Consumer<MBTIPersonalityProvider>(
-                  builder: (context, provider, child) {
-                    // Safety check - show loading if provider is loading or not properly initialized
-                    if (provider.isLoading || provider.questions.isEmpty) {
-                      return const Center(
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            CircularProgressIndicator(color: Colors.white),
-                            SizedBox(height: 16),
-                            Text(
-                              'Initializing MBTI Assessment...',
-                              style: TextStyle(
-                                color: Colors.white,
-                                fontSize: 18,
-                                fontWeight: FontWeight.w500,
-                              ),
+      backgroundColor: colorScheme.surface,
+      appBar: AppBar(
+        backgroundColor: colorScheme.surface,
+        elevation: 0,
+        leading: IconButton(
+          icon: Icon(Icons.arrow_back, color: colorScheme.onSurface),
+          onPressed: () => context.pop(),
+        ),
+        title: Text(
+          'MBTI Test',
+          style: GoogleFonts.roboto(
+            fontSize: 20,
+            fontWeight: FontWeight.w600,
+            color: colorScheme.onSurface,
+          ),
+        ),
+      ),
+      body: SafeArea(
+        child: Consumer<MBTIPersonalityProvider>(
+          builder: (context, provider, child) {
+            if (provider.isLoading || provider.questions.isEmpty) {
+              return Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    CircularProgressIndicator(color: colorScheme.primary),
+                    const SizedBox(height: 16),
+                    Text(
+                      'Initializing MBTI Assessment...',
+                      style: GoogleFonts.roboto(
+                        color: colorScheme.onSurface,
+                        fontSize: 18,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                  ],
+                ),
+              );
+            }
+
+            final currentQuestion = provider.currentQuestion;
+            final progress = provider.progress;
+            final isLastQuestion = !provider.hasNextQuestion;
+            final canProceed = _selectedOptionIndex != null;
+
+            return Padding(
+              padding: const EdgeInsets.all(24.0),
+              child: Column(
+                children: [
+                  // Progress bar
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text(
+                            'Question ${provider.currentQuestionIndex + 1} of ${provider.questions.length}',
+                            style: GoogleFonts.inter(
+                              fontSize: 14,
+                              color: Colors.grey[400],
                             ),
-                          ],
-                        ),
-                      );
-                    }
-
-                    final currentQuestion = provider.currentQuestion;
-                    final progress = provider.progress;
-                    final isLastQuestion = !provider.hasNextQuestion;
-                    final canProceed = _selectedOptionIndex != null; // Can proceed if an option is selected
-
-                    return Column(
+                          ),
+                          Text(
+                            '${(progress * 100).round()}%',
+                            style: GoogleFonts.inter(
+                              fontSize: 14,
+                              color: Colors.grey[400],
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 8),
+                      LinearProgressIndicator(
+                        value: progress,
+                        backgroundColor: Colors.grey[800],
+                        valueColor: const AlwaysStoppedAnimation<Color>(Color(0xFF8B5CF6)),
+                      ),
+                    ],
+                  ),
+                  
+                  const SizedBox(height: 40),
+                  
+                  // Question
+                  Expanded(
+                    child: Column(
                       children: [
-                        // Header with progress
-                        Padding(
-                          padding: const EdgeInsets.all(20.0),
-                          child: Column(
-                            children: [
-                              // Back button and progress
-                              Row(
-                                children: [
-                                  IconButton(
-                                    onPressed: () => context.go('/'),
-                                    icon: const Icon(
-                                      Icons.arrow_back_rounded,
-                                      color: Colors.white,
-                                      size: 28,
-                                    ),
-                                  ),
-                                  Expanded(
-                                    child: Column(
-                                      children: [
-                                        Text(
-                                          'Question ${provider.currentQuestionIndex + 1} of ${provider.questions.length}',
-                                          style: TextStyle(
-                                            color: Colors.white.withOpacity(0.8),
-                                            fontSize: 16,
-                                            fontWeight: FontWeight.w500,
-                                          ),
-                                        ),
-                                        const SizedBox(height: 8),
-                                        LinearProgressIndicator(
-                                          value: progress,
-                                          backgroundColor: Colors.white.withOpacity(0.2),
-                                          valueColor: const AlwaysStoppedAnimation<Color>(Colors.white),
-                                          borderRadius: BorderRadius.circular(4),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                  const SizedBox(width: 48), // Balance the back button
-                                ],
-                              ),
-                            ],
+                        Container(
+                          width: double.infinity,
+                          padding: const EdgeInsets.all(24),
+                          decoration: BoxDecoration(
+                            color: Colors.grey[900],
+                            borderRadius: BorderRadius.circular(16),
                           ),
-                        ),
-
-                        // Question content
-                        Expanded(
-                          child: SingleChildScrollView(
-                            child: Padding(
-                              padding: const EdgeInsets.all(20.0),
-                              child: AnimatedQuestionCard(
-                                questionTitle: currentQuestion.title,
-                                questionText: currentQuestion.question,
-                                options: currentQuestion.options ?? [],
-                                selectedOptionIndex: _selectedOptionIndex,
-                                onOptionSelected: (index) {
-                                  setState(() {
-                                    _selectedOptionIndex = index;
-                                  });
-                                },
-                                questionIndex: provider.currentQuestionIndex,
-                              ),
+                          child: Text(
+                            currentQuestion.question,
+                            style: GoogleFonts.roboto(
+                              fontSize: 20,
+                              fontWeight: FontWeight.w600,
+                              color: colorScheme.onSurface,
+                              height: 1.4,
                             ),
+                            textAlign: TextAlign.center,
                           ),
                         ),
-
-                        // Navigation buttons
-                        Padding(
-                          padding: const EdgeInsets.all(20.0),
-                          child: Row(
-                            children: [
-                              // Previous button
-                              if (provider.hasPreviousQuestion)
-                                Expanded(
-                                  child: AnimatedButton(
-                                    onPressed: _previousQuestion,
-                                    backgroundColor: Colors.white.withOpacity(0.2),
-                                    child: const Row(
-                                      mainAxisAlignment: MainAxisAlignment.center,
-                                      children: [
-                                        Icon(Icons.arrow_back, color: Colors.white, size: 20),
-                                        SizedBox(width: 8),
-                                        Text(
-                                          'Previous',
-                                          style: TextStyle(
-                                            color: Colors.white,
-                                            fontSize: 16,
-                                            fontWeight: FontWeight.w600,
-                                          ),
+                        
+                        const SizedBox(height: 32),
+                        
+                        // Options
+                        Expanded(
+                          child: ListView.builder(
+                            itemCount: currentQuestion.options?.length ?? 0,
+                            itemBuilder: (context, index) {
+                              final isSelected = _selectedOptionIndex == index;
+                              
+                              return Container(
+                                margin: const EdgeInsets.only(bottom: 16),
+                                child: Material(
+                                  color: Colors.transparent,
+                                  child: InkWell(
+                                    borderRadius: BorderRadius.circular(12),
+                                    onTap: () => _selectOption(index),
+                                    child: Container(
+                                      padding: const EdgeInsets.all(20),
+                                      decoration: BoxDecoration(
+                                        color: isSelected 
+                                            ? const Color(0xFF8B5CF6).withOpacity(0.2)
+                                            : Colors.grey[800],
+                                        borderRadius: BorderRadius.circular(12),
+                                        border: Border.all(
+                                          color: isSelected 
+                                              ? const Color(0xFF8B5CF6)
+                                              : Colors.transparent,
+                                          width: 2,
                                         ),
-                                      ],
-                                    ),
-                                  ),
-                                ),
-
-                              if (provider.hasPreviousQuestion) const SizedBox(width: 16),
-
-                              // Next/Complete button
-                              Expanded(
-                                flex: provider.hasPreviousQuestion ? 1 : 2,
-                                child: AnimatedButton(
-                                  onPressed: canProceed ? _nextQuestion : null,
-                                  backgroundColor: canProceed 
-                                      ? null 
-                                      : Colors.white.withOpacity(0.1),
-                                  child: provider.isLoading
-                                      ? const SizedBox(
-                                          width: 24,
-                                          height: 24,
-                                          child: CircularProgressIndicator(
-                                            strokeWidth: 2,
-                                            valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
-                                          ),
-                                        )
-                                      : Row(
-                                          mainAxisAlignment: MainAxisAlignment.center,
-                                          mainAxisSize: MainAxisSize.min,
-                                          children: [
-                                            Flexible(
-                                              child: Text(
-                                                isLastQuestion ? 'Complete' : 'Next',
-                                                style: TextStyle(
-                                                  color: canProceed ? Colors.white : Colors.white.withOpacity(0.5),
-                                                  fontSize: 16,
-                                                  fontWeight: FontWeight.w600,
-                                                ),
-                                                overflow: TextOverflow.ellipsis,
+                                      ),
+                                      child: Row(
+                                        children: [
+                                          Container(
+                                            width: 24,
+                                            height: 24,
+                                            decoration: BoxDecoration(
+                                              shape: BoxShape.circle,
+                                              color: isSelected 
+                                                  ? const Color(0xFF8B5CF6)
+                                                  : Colors.transparent,
+                                              border: Border.all(
+                                                color: isSelected 
+                                                    ? const Color(0xFF8B5CF6)
+                                                    : Colors.grey[600]!,
+                                                width: 2,
                                               ),
                                             ),
-                                            const SizedBox(width: 8),
-                                            Icon(
-                                              isLastQuestion ? Icons.check : Icons.arrow_forward,
-                                              color: canProceed ? Colors.white : Colors.white.withOpacity(0.5),
-                                              size: 20,
+                                            child: isSelected
+                                                ? Icon(
+                                                    Icons.check,
+                                                    color: colorScheme.onPrimary,
+                                                    size: 16,
+                                                  )
+                                                : null,
+                                          ),
+                                          const SizedBox(width: 16),
+                                          Expanded(
+                                            child: Text(
+                                              currentQuestion.options?[index] ?? '',
+                                              style: GoogleFonts.roboto(
+                                                fontSize: 16,
+                                                color: colorScheme.onSurface,
+                                                height: 1.3,
+                                              ),
                                             ),
-                                          ],
-                                        ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  ),
                                 ),
-                              ),
-                            ],
+                              );
+                            },
                           ),
                         ),
                       ],
-                    );
-                  },
-            ),
-          ),
+                    ),
+                  ),
+                  
+                  // Navigation buttons
+                  Row(
+                    children: [
+                      if (provider.hasPreviousQuestion) ...[
+                        Expanded(
+                          child: SimpleButton(
+                            text: 'Previous',
+                            onPressed: _previousQuestion,
+                            isOutlined: true,
+                            icon: Icons.arrow_back,
+                          ),
+                        ),
+                        const SizedBox(width: 16),
+                      ],
+                      Expanded(
+                        child: SimpleButton(
+                          text: isLastQuestion ? 'Complete' : 'Next',
+                          onPressed: canProceed ? _nextQuestion : () {},
+                          backgroundColor: canProceed 
+                              ? const Color(0xFF8B5CF6)
+                              : Colors.grey[700],
+                          icon: isLastQuestion ? Icons.check : Icons.arrow_forward,
+                          isLoading: provider.isLoading,
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            );
+          },
         ),
       ),
     );

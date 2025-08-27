@@ -11,7 +11,7 @@ import '../providers/personality_provider.dart';
 import '../providers/mbti_personality_provider.dart';
 import '../models/personality_result.dart';
 import '../models/mbti_personality_result.dart';
-import '../widgets/gradient_background.dart';
+import '../widgets/material_background.dart';
 import '../widgets/result_card.dart';
 import '../widgets/trait_chip.dart';
 
@@ -642,9 +642,10 @@ class _ResultsScreenState extends State<ResultsScreen>
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: GradientBackground(
-        child: Consumer2<PersonalityProvider, MBTIPersonalityProvider>(
+    return MaterialBackground(
+      child: Scaffold(
+        backgroundColor: Colors.transparent,
+        body: Consumer2<PersonalityProvider, MBTIPersonalityProvider>(
           builder: (context, provider, mbtiProvider, child) {
             final result = provider.result;
             final mbtiResult = mbtiProvider.result;

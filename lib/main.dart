@@ -1,18 +1,19 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'config/supabase_config.dart';
+import 'screens/main_screen.dart';
 import 'screens/welcome_home_screen.dart';
 import 'screens/personality_test_screen.dart';
 import 'screens/results_screen.dart';
-import 'screens/history_screen.dart';
 import 'screens/mbti_test_screen.dart';
-import 'screens/mbti_history_screen.dart';
+import 'screens/test_history_screen.dart';
 import 'providers/personality_provider.dart';
 import 'providers/mbti_personality_provider.dart';
+import 'providers/theme_provider.dart';
+import 'providers/navigation_provider.dart';
 import 'services/notification_service.dart';
 import 'services/audio_service.dart';
 
@@ -65,7 +66,7 @@ final GoRouter _router = GoRouter(
       path: '/',
       pageBuilder: (context, state) => CustomTransitionPage<void>(
         key: state.pageKey,
-        child: const WelcomeHomeScreen(),
+        child: const MainScreen(),
         transitionsBuilder: (context, animation, secondaryAnimation, child) =>
             FadeTransition(opacity: animation, child: child),
       ),
@@ -118,24 +119,6 @@ final GoRouter _router = GoRouter(
             ),
       ),
     ),
-    GoRoute(
-      path: '/history',
-      pageBuilder: (context, state) => CustomTransitionPage<void>(
-        key: state.pageKey,
-        child: const HistoryScreen(),
-        transitionsBuilder: (context, animation, secondaryAnimation, child) =>
-            SlideTransition(
-              position:
-                  Tween<Offset>(
-                    begin: const Offset(-1.0, 0.0),
-                    end: Offset.zero,
-                  ).animate(
-                    CurvedAnimation(parent: animation, curve: Curves.easeInOut),
-                  ),
-              child: child,
-            ),
-      ),
-    ),
     // New MBTI personality test routes
     GoRoute(
       path: '/mbti-test',
@@ -170,10 +153,10 @@ final GoRouter _router = GoRouter(
       ),
     ),
     GoRoute(
-      path: '/mbti-history',
+      path: '/test-history',
       pageBuilder: (context, state) => CustomTransitionPage<void>(
         key: state.pageKey,
-        child: const MBTIHistoryScreen(),
+        child: const TestHistoryScreen(),
         transitionsBuilder: (context, animation, secondaryAnimation, child) =>
             SlideTransition(
               position:
@@ -213,28 +196,133 @@ class MyApp extends StatelessWidget {
             return provider;
           },
         ),
+        ChangeNotifierProvider(
+          create: (context) {
+            final provider = ThemeProvider();
+            // Initialize the provider to load preferences
+            provider.initialize();
+            return provider;
+          },
+        ),
+        ChangeNotifierProvider(
+          create: (context) => NavigationProvider(),
+        ),
       ],
-      child: MaterialApp.router(
+      child: Consumer<ThemeProvider>(
+        builder: (context, themeProvider, child) {
+          return MaterialApp.router(
         title: 'Personify - Personality Test',
         debugShowCheckedModeBanner: false,
         theme: ThemeData(
           colorScheme: ColorScheme.fromSeed(
-            seedColor: const Color(0xFF6C63FF),
+            seedColor: const Color(0xFF6750A4), // Material 3 Purple
             brightness: Brightness.light,
           ),
-          textTheme: GoogleFonts.poppinsTextTheme(),
+          textTheme: GoogleFonts.robotoTextTheme().apply(
+            bodyColor: const Color(0xFF1D1B20),
+            displayColor: const Color(0xFF1D1B20),
+          ),
           useMaterial3: true,
+          appBarTheme: const AppBarTheme(
+            centerTitle: false,
+            elevation: 0,
+            scrolledUnderElevation: 0,
+          ),
+          cardTheme: const CardThemeData(
+            elevation: 0,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.all(Radius.circular(12)),
+            ),
+          ),
           elevatedButtonTheme: ElevatedButtonThemeData(
             style: ElevatedButton.styleFrom(
               elevation: 0,
-              padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
+              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
               shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(12),
+                borderRadius: BorderRadius.circular(20),
               ),
             ),
           ),
+          filledButtonTheme: FilledButtonThemeData(
+            style: FilledButton.styleFrom(
+              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(20),
+              ),
+            ),
+          ),
+          outlinedButtonTheme: OutlinedButtonThemeData(
+            style: OutlinedButton.styleFrom(
+              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(20),
+              ),
+            ),
+          ),
+          inputDecorationTheme: InputDecorationTheme(
+            filled: true,
+            border: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(4),
+            ),
+          ),
         ),
+        darkTheme: ThemeData(
+          colorScheme: ColorScheme.fromSeed(
+            seedColor: const Color(0xFF6750A4),
+            brightness: Brightness.dark,
+          ),
+          textTheme: GoogleFonts.robotoTextTheme().apply(
+            bodyColor: const Color(0xFFE6E0E9),
+            displayColor: const Color(0xFFE6E0E9),
+          ),
+          useMaterial3: true,
+          appBarTheme: const AppBarTheme(
+            centerTitle: false,
+            elevation: 0,
+            scrolledUnderElevation: 0,
+          ),
+          cardTheme: const CardThemeData(
+            elevation: 0,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.all(Radius.circular(12)),
+            ),
+          ),
+          elevatedButtonTheme: ElevatedButtonThemeData(
+            style: ElevatedButton.styleFrom(
+              elevation: 0,
+              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(20),
+              ),
+            ),
+          ),
+          filledButtonTheme: FilledButtonThemeData(
+            style: FilledButton.styleFrom(
+              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(20),
+              ),
+            ),
+          ),
+          outlinedButtonTheme: OutlinedButtonThemeData(
+            style: OutlinedButton.styleFrom(
+              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(20),
+              ),
+            ),
+          ),
+          inputDecorationTheme: InputDecorationTheme(
+            filled: true,
+            border: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(4),
+            ),
+          ),
+        ),
+        themeMode: themeProvider.themeMode,
         routerConfig: _router,
+      );
+        },
       ),
     );
   }

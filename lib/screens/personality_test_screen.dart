@@ -107,9 +107,9 @@ class _PersonalityTestScreenState extends State<PersonalityTestScreen>
         await _questionFadeController.reverse();
         
         provider.nextQuestion();
-        final newQuestionId = provider.currentQuestion.id;
+        // Clear selection for new question instead of auto-selecting previous answer
         setState(() {
-          _selectedAnswer = provider.answers[newQuestionId];
+          _selectedAnswer = null;
         });
         
         // Small delay for smooth transition

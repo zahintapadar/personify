@@ -110,6 +110,7 @@ flutter:
     - assets/models/
     - assets/data/
     - assets/audio/
+    - assets/images/
     - LogoTransparent.jpg
 
   # An image asset can refer to one or more resolution-specific "variants", see
