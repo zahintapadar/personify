@@ -45,41 +45,9 @@ def load_and_preprocess_data(csv_path):
     # Use 100% of the dataset for maximum accuracy
     df_sample = df  # Use entire dataset
     print(f"Using full dataset: {df_sample.shape[0]} samples")
-    
-    # Balanced sampling for better performance - use more data per class
-    balanced_samples = []
-    min_samples_per_class = 200   # Higher minimum samples per class
-    max_samples_per_class = 2000  # Much more samples per class for better learning
-    
-    for mbti_type in df_sample['type'].unique():
-        type_samples = df_sample[df_sample['type'] == mbti_type]
-        available_samples = len(type_samples)
-        
-        if available_samples < min_samples_per_class:
-            print(f"Warning: {mbti_type} has only {available_samples} samples (less than {min_samples_per_class})")
-            samples_to_take = available_samples
-        else:
-            samples_to_take = min(available_samples, max_samples_per_class)
-        
-        # Randomly sample the data
-        if samples_to_take < available_samples:
-            selected_samples = type_samples.sample(n=samples_to_take, random_state=42)
-        else:
-            selected_samples = type_samples
-            
-        balanced_samples.append(selected_samples)
-        print(f"{mbti_type}: {samples_to_take} samples")
-    
-    df_balanced = pd.concat(balanced_samples, ignore_index=True)
-    print(f"Balanced dataset size: {df_balanced.shape[0]}")
-    print(f"Distribution of types:\n{df_balanced['type'].value_counts()}")
-    
-    # Extract posts and labels
-    texts = df_balanced['posts'].values
-    labels = df_balanced['type'].values
-    
-    # Preprocess texts - keep first 500 characters and clean
-    texts = [str(text)[:500].lower() for text in texts]
+    # No sampling, use all available data for each class
+    texts = df_sample['posts'].astype(str).str.lower().values
+    labels = df_sample['type'].values
     print(f"Text length: average {np.mean([len(text) for text in texts]):.0f} characters")
     
     # Cache the processed data
@@ -96,7 +64,6 @@ def create_tfidf_features(texts, max_features=5000):
     # Check for cached TF-IDF vectorizer
     tfidf_cache = CACHE_DIR / f"tfidf_vectorizer_{max_features}.pkl"
     features_cache = CACHE_DIR / f"tfidf_features_{max_features}.pkl"
-    
     if tfidf_cache.exists() and features_cache.exists():
         print("Loading TF-IDF vectorizer and features from cache...")
         with open(tfidf_cache, 'rb') as f:
@@ -104,32 +71,25 @@ def create_tfidf_features(texts, max_features=5000):
         with open(features_cache, 'rb') as f:
             features = pickle.load(f)
         return features, vectorizer
-    
     # Create TF-IDF vectorizer with enhanced parameters for accuracy
     vectorizer = TfidfVectorizer(
         max_features=max_features,
         stop_words='english',
-        ngram_range=(1, 3),  # Include trigrams for better context
+        ngram_range=(1, 4),  # Up to 4-grams for more context
         lowercase=True,
         strip_accents='ascii',
-        min_df=2,  # Ignore terms that appear in less than 2 documents
-        max_df=0.95,  # Ignore terms that appear in more than 95% of documents
-        sublinear_tf=True  # Apply sublinear TF scaling
+        min_df=2,
+        max_df=0.95,
+        sublinear_tf=True
     )
-    
-    # Fit and transform texts
     features = vectorizer.fit_transform(texts).toarray()
-    
     print(f"TF-IDF features shape: {features.shape}")
     print(f"Feature vocabulary size: {len(vectorizer.vocabulary_)}")
-    
-    # Cache vectorizer and features
     print("Caching TF-IDF vectorizer and features...")
     with open(tfidf_cache, 'wb') as f:
         pickle.dump(vectorizer, f)
     with open(features_cache, 'wb') as f:
         pickle.dump(features, f)
-    
     return features, vectorizer
 
 def create_linear_model(input_dim, num_classes):
@@ -137,69 +97,45 @@ def create_linear_model(input_dim, num_classes):
     print(f"Creating linear model with input_dim={input_dim}, num_classes={num_classes}")
     
     model = tf.keras.Sequential([
-        # Input layer
-        tf.keras.layers.Dense(
-            256, 
-            activation='relu', 
-            input_shape=(input_dim,),
-            kernel_regularizer=tf.keras.regularizers.l2(0.001)
-        ),
+        tf.keras.layers.Dense(512, activation='relu', input_shape=(input_dim,), kernel_regularizer=tf.keras.regularizers.l2(0.0005)),
+        tf.keras.layers.BatchNormalization(),
         tf.keras.layers.Dropout(0.5),
-        
-        # Hidden layer
-        tf.keras.layers.Dense(
-            128, 
-            activation='relu',
-            kernel_regularizer=tf.keras.regularizers.l2(0.001)
-        ),
+        tf.keras.layers.Dense(256, activation='relu', kernel_regularizer=tf.keras.regularizers.l2(0.0005)),
+        tf.keras.layers.BatchNormalization(),
+        tf.keras.layers.Dropout(0.4),
+        tf.keras.layers.Dense(128, activation='relu', kernel_regularizer=tf.keras.regularizers.l2(0.0005)),
+        tf.keras.layers.BatchNormalization(),
         tf.keras.layers.Dropout(0.3),
-        
-        # Hidden layer
-        tf.keras.layers.Dense(
-            64, 
-            activation='relu',
-            kernel_regularizer=tf.keras.regularizers.l2(0.001)
-        ),
+        tf.keras.layers.Dense(64, activation='relu', kernel_regularizer=tf.keras.regularizers.l2(0.0005)),
         tf.keras.layers.Dropout(0.2),
-        
-        # Output layer
         tf.keras.layers.Dense(num_classes, activation='softmax')
     ])
-    
-    # Compile with appropriate optimizer and loss
     model.compile(
-        optimizer=tf.keras.optimizers.Adam(learning_rate=0.001),
+        optimizer=tf.keras.optimizers.Adam(learning_rate=0.0007),
         loss='sparse_categorical_crossentropy',
         metrics=['accuracy']
     )
-    
     return model
 
 def main():
     start_time = time.time()
     
-    # Configuration for mobile-optimized linear model
-    MAX_FEATURES = 1000   # TF-IDF max features for speed
-    BATCH_SIZE = 64       # Batch size for training
-    EPOCHS = 15           # More epochs for linear model
-    
-    print("=== TensorFlow Linear MBTI Classification Model ===")
+    # Configuration for extremely accurate linear model
+    MAX_FEATURES = 20000   # TF-IDF max features for accuracy
+    BATCH_SIZE = 128       # Larger batch size for faster training
+    EPOCHS = 60            # More epochs for deeper learning
+    print("=== TensorFlow Linear MBTI Classification Model (Max Accuracy) ===")
     print(f"Configuration: max_features={MAX_FEATURES}, batch_size={BATCH_SIZE}, epochs={EPOCHS}")
-    
     # Load data
     csv_path = '../lib/data/mbti_personality.csv'
     texts, labels = load_and_preprocess_data(csv_path)
-    
     # Create TF-IDF features
     X_tfidf, vectorizer = create_tfidf_features(texts, max_features=MAX_FEATURES)
-    
     # Encode labels
     label_encoder = LabelEncoder()
     y_encoded = label_encoder.fit_transform(labels)
-    
     print(f"Label classes: {label_encoder.classes_}")
     print(f"Number of classes: {len(label_encoder.classes_)}")
-    
     # Split data
     X_train, X_test, y_train, y_test = train_test_split(
         X_tfidf, y_encoded, 
@@ -207,11 +143,9 @@ def main():
         random_state=42, 
         stratify=y_encoded
     )
-    
     print(f"Training samples: {X_train.shape[0]}")
     print(f"Test samples: {X_test.shape[0]}")
     print(f"Feature dimensions: {X_train.shape[1]}")
-    
     # Calculate class weights for imbalanced dataset
     from sklearn.utils.class_weight import compute_class_weight
     class_weights = compute_class_weight(
@@ -221,43 +155,43 @@ def main():
     )
     class_weight_dict = dict(enumerate(class_weights))
     print(f"Using balanced class weights")
-    
     # Create and train model
     model = create_linear_model(X_train.shape[1], len(label_encoder.classes_))
-    
     print("\nModel architecture:")
     model.summary()
-    
     # Training callbacks
     early_stopping = tf.keras.callbacks.EarlyStopping(
         monitor='val_accuracy', 
-        patience=5, 
+        patience=10, 
         restore_best_weights=True,
-        verbose=1
+        verbose=1,
+        min_delta=0.001
     )
-    
     reduce_lr = tf.keras.callbacks.ReduceLROnPlateau(
         monitor='val_loss', 
-        factor=0.2, 
-        patience=3, 
-        min_lr=0.0001,
+        factor=0.5, 
+        patience=5, 
+        min_lr=0.00005,
         verbose=1
     )
-    
+    checkpoint = tf.keras.callbacks.ModelCheckpoint(
+        filepath='../cache/best_linear_model.keras',
+        monitor='val_accuracy',
+        save_best_only=True,
+        verbose=1
+    )
     # Train the model
     print("\nTraining model...")
     training_start = time.time()
-    
     history = model.fit(
         X_train, y_train,
         batch_size=BATCH_SIZE,
         epochs=EPOCHS,
         validation_data=(X_test, y_test),
         class_weight=class_weight_dict,
-        callbacks=[early_stopping, reduce_lr],
+        callbacks=[early_stopping, reduce_lr, checkpoint],
         verbose=1
     )
-    
     training_time = time.time() - training_start
     print(f"Training completed in {training_time:.2f} seconds")
     
