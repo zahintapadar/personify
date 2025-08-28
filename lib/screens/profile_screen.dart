@@ -2,11 +2,40 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
+import 'package:url_launcher/url_launcher.dart';
 import '../widgets/material_background.dart';
 import '../providers/mbti_personality_provider.dart';
+import '../services/audio_service.dart';
+import 'about_screen.dart';
 
-class ProfileScreen extends StatelessWidget {
+class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
+
+  @override
+  State<ProfileScreen> createState() => _ProfileScreenState();
+}
+
+class _ProfileScreenState extends State<ProfileScreen> {
+  bool _isMusicEnabled = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadMusicState();
+  }
+
+  Future<void> _loadMusicState() async {
+    setState(() {
+      _isMusicEnabled = AudioService.isMusicEnabled;
+    });
+  }
+
+  Future<void> _toggleMusic(bool value) async {
+    await AudioService.setMusicEnabled(value);
+    setState(() {
+      _isMusicEnabled = value;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -17,6 +46,7 @@ class ProfileScreen extends StatelessWidget {
           backgroundColor: Colors.transparent,
           elevation: 0,
           scrolledUnderElevation: 0,
+          centerTitle: true,
           title: Text(
             'Profile',
             style: GoogleFonts.roboto(
@@ -25,10 +55,7 @@ class ProfileScreen extends StatelessWidget {
               color: Colors.white,
             ),
           ),
-          leading: IconButton(
-            icon: const Icon(Icons.arrow_back, color: Colors.white),
-            onPressed: () => Navigator.of(context).pop(),
-          ),
+          automaticallyImplyLeading: false,
         ),
         body: SingleChildScrollView(
           padding: const EdgeInsets.all(16.0),
@@ -119,6 +146,7 @@ class ProfileScreen extends StatelessWidget {
               
               Column(
                 children: [
+                  _buildMusicToggleTile(),
                   _buildSettingsTile(
                     icon: Icons.history,
                     title: 'Test History',
@@ -129,13 +157,19 @@ class ProfileScreen extends StatelessWidget {
                     icon: Icons.info_outline,
                     title: 'About Personify',
                     subtitle: 'Learn more about personality types',
-                    onTap: () => context.push('/about'),
+                    onTap: () {
+                      Navigator.of(context).push(
+                        MaterialPageRoute(
+                          builder: (context) => const AboutScreen(),
+                        ),
+                      );
+                    },
                   ),
                   _buildSettingsTile(
                     icon: Icons.help_outline,
                     title: 'Help & Support',
                     subtitle: 'Get help and contact support',
-                    onTap: () => context.push('/support'),
+                    onTap: _handleContactSupport,
                   ),
                   _buildSettingsTile(
                     icon: Icons.share,
@@ -267,7 +301,7 @@ class ProfileScreen extends StatelessWidget {
                     color: Colors.white.withOpacity(0.2),
                   ),
                   _buildStatColumn(
-                    count: '${avgConfidence}%',
+                    count: '$avgConfidence%',
                     label: 'Avg Confidence',
                     icon: Icons.trending_up,
                   ),
@@ -277,7 +311,7 @@ class ProfileScreen extends StatelessWidget {
                     color: Colors.white.withOpacity(0.2),
                   ),
                   _buildStatColumn(
-                    count: testCount > 0 ? '${testCount}' : '0',
+                    count: testCount > 0 ? '$testCount' : '0',
                     label: 'Streak',
                     icon: Icons.local_fire_department,
                   ),
@@ -402,6 +436,57 @@ class ProfileScreen extends StatelessWidget {
     );
   }
 
+  Widget _buildMusicToggleTile() {
+    return Container(
+      margin: const EdgeInsets.only(bottom: 8),
+      decoration: BoxDecoration(
+        color: Colors.white.withOpacity(0.1),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(
+          color: Colors.white.withOpacity(0.2),
+          width: 1,
+        ),
+      ),
+      child: ListTile(
+        leading: Container(
+          padding: const EdgeInsets.all(8),
+          decoration: BoxDecoration(
+            color: const Color(0xFF8B5CF6).withOpacity(0.2),
+            borderRadius: BorderRadius.circular(8),
+          ),
+          child: const Icon(
+            Icons.music_note,
+            color: Color(0xFF8B5CF6),
+            size: 20,
+          ),
+        ),
+        title: Text(
+          'Background Music',
+          style: GoogleFonts.roboto(
+            fontSize: 16,
+            fontWeight: FontWeight.w500,
+            color: Colors.white,
+          ),
+        ),
+        subtitle: Text(
+          'Toggle background music on/off',
+          style: GoogleFonts.roboto(
+            fontSize: 14,
+            color: Colors.white.withOpacity(0.7),
+          ),
+        ),
+        trailing: Switch(
+          value: _isMusicEnabled,
+          onChanged: _toggleMusic,
+          activeColor: const Color(0xFF8B5CF6),
+          activeTrackColor: const Color(0xFF8B5CF6).withOpacity(0.3),
+          inactiveThumbColor: Colors.white.withOpacity(0.7),
+          inactiveTrackColor: Colors.white.withOpacity(0.2),
+        ),
+      ),
+    );
+  }
+
   void _shareApp(BuildContext context) {
     // Implement share functionality
     ScaffoldMessenger.of(context).showSnackBar(
@@ -417,5 +502,62 @@ class ProfileScreen extends StatelessWidget {
         ),
       ),
     );
+  }
+
+  void _handleContactSupport() async {
+    final Uri emailLaunchUri = Uri(
+      scheme: 'mailto',
+      path: 'zahintapadar@gmail.com',
+      query: encodeQueryParameters(<String, String>{
+        'subject': 'Personify App Support',
+      }),
+    );
+
+    try {
+      if (await canLaunchUrl(emailLaunchUri)) {
+        await launchUrl(emailLaunchUri);
+      } else {
+        // Fallback: show error message
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(
+                'Could not open email client. Please email us at zahintapadar@gmail.com',
+                style: GoogleFonts.roboto(color: Colors.white),
+              ),
+              backgroundColor: Colors.red.withOpacity(0.8),
+              behavior: SnackBarBehavior.floating,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(8),
+              ),
+            ),
+          );
+        }
+      }
+    } catch (e) {
+      // Error handling
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              'Error opening email client. Please contact zahintapadar@gmail.com',
+              style: GoogleFonts.roboto(color: Colors.white),
+            ),
+            backgroundColor: Colors.red.withOpacity(0.8),
+            behavior: SnackBarBehavior.floating,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(8),
+            ),
+          ),
+        );
+      }
+    }
+  }
+
+  String? encodeQueryParameters(Map<String, String> params) {
+    return params.entries
+        .map((MapEntry<String, String> e) =>
+            '${Uri.encodeComponent(e.key)}=${Uri.encodeComponent(e.value)}')
+        .join('&');
   }
 }

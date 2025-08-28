@@ -9,11 +9,19 @@ import 'screens/welcome_home_screen.dart';
 import 'screens/personality_test_screen.dart';
 import 'screens/results_screen.dart';
 import 'screens/mbti_test_screen.dart';
+import 'screens/bigfive_test_screen.dart';
+import 'screens/bigfive_result_screen.dart';
+import 'screens/bigfive_history_screen.dart';
+import 'screens/chat_screen.dart';
+import 'screens/crisis_screen.dart';
 import 'screens/test_history_screen.dart';
 import 'providers/personality_provider.dart';
 import 'providers/mbti_personality_provider.dart';
+import 'providers/bigfive_personality_provider.dart';
+import 'providers/chat_provider.dart';
 import 'providers/theme_provider.dart';
 import 'providers/navigation_provider.dart';
+import 'providers/auth_provider.dart';
 import 'services/notification_service.dart';
 import 'services/audio_service.dart';
 
@@ -152,6 +160,57 @@ final GoRouter _router = GoRouter(
             ),
       ),
     ),
+    // Big Five personality test routes
+    GoRoute(
+      path: '/bigfive-test',
+      pageBuilder: (context, state) => CustomTransitionPage<void>(
+        key: state.pageKey,
+        child: const BigFiveTestScreen(),
+        transitionsBuilder: (context, animation, secondaryAnimation, child) =>
+            SlideTransition(
+              position:
+                  Tween<Offset>(
+                    begin: const Offset(0.0, 1.0),
+                    end: Offset.zero,
+                  ).animate(
+                    CurvedAnimation(parent: animation, curve: Curves.easeInOut),
+                  ),
+              child: child,
+            ),
+      ),
+    ),
+    GoRoute(
+      path: '/bigfive-result',
+      pageBuilder: (context, state) => CustomTransitionPage<void>(
+        key: state.pageKey,
+        child: const BigFiveResultScreen(),
+        transitionsBuilder: (context, animation, secondaryAnimation, child) =>
+            ScaleTransition(
+              scale: Tween<double>(begin: 0.8, end: 1.0).animate(
+                CurvedAnimation(parent: animation, curve: Curves.elasticOut),
+              ),
+              child: FadeTransition(opacity: animation, child: child),
+            ),
+      ),
+    ),
+    GoRoute(
+      path: '/bigfive-history',
+      pageBuilder: (context, state) => CustomTransitionPage<void>(
+        key: state.pageKey,
+        child: const BigFiveHistoryScreen(),
+        transitionsBuilder: (context, animation, secondaryAnimation, child) =>
+            SlideTransition(
+              position:
+                  Tween<Offset>(
+                    begin: const Offset(-1.0, 0.0),
+                    end: Offset.zero,
+                  ).animate(
+                    CurvedAnimation(parent: animation, curve: Curves.easeInOut),
+                  ),
+              child: child,
+            ),
+      ),
+    ),
     GoRoute(
       path: '/test-history',
       pageBuilder: (context, state) => CustomTransitionPage<void>(
@@ -162,6 +221,42 @@ final GoRouter _router = GoRouter(
               position:
                   Tween<Offset>(
                     begin: const Offset(-1.0, 0.0),
+                    end: Offset.zero,
+                  ).animate(
+                    CurvedAnimation(parent: animation, curve: Curves.easeInOut),
+                  ),
+              child: child,
+            ),
+      ),
+    ),
+    GoRoute(
+      path: '/chat',
+      pageBuilder: (context, state) => CustomTransitionPage<void>(
+        key: state.pageKey,
+        child: const ChatScreen(),
+        transitionsBuilder: (context, animation, secondaryAnimation, child) =>
+            SlideTransition(
+              position:
+                  Tween<Offset>(
+                    begin: const Offset(1.0, 0.0),
+                    end: Offset.zero,
+                  ).animate(
+                    CurvedAnimation(parent: animation, curve: Curves.easeInOut),
+                  ),
+              child: child,
+            ),
+      ),
+    ),
+    GoRoute(
+      path: '/crisis',
+      pageBuilder: (context, state) => CustomTransitionPage<void>(
+        key: state.pageKey,
+        child: const CrisisScreen(),
+        transitionsBuilder: (context, animation, secondaryAnimation, child) =>
+            SlideTransition(
+              position:
+                  Tween<Offset>(
+                    begin: const Offset(0.0, 1.0),
                     end: Offset.zero,
                   ).animate(
                     CurvedAnimation(parent: animation, curve: Curves.easeInOut),
@@ -195,6 +290,20 @@ class MyApp extends StatelessWidget {
             provider.initializeML();
             return provider;
           },
+        ),
+        ChangeNotifierProvider(
+          create: (context) {
+            final provider = BigFivePersonalityProvider();
+            // Initialize the provider to load history
+            provider.initializeML();
+            return provider;
+          },
+        ),
+        ChangeNotifierProvider(
+          create: (context) => ChatProvider(),
+        ),
+        ChangeNotifierProvider(
+          create: (context) => AuthProvider(),
         ),
         ChangeNotifierProvider(
           create: (context) {
@@ -319,7 +428,7 @@ class MyApp extends StatelessWidget {
             ),
           ),
         ),
-        themeMode: themeProvider.themeMode,
+        themeMode: ThemeMode.dark, // Force dark mode always
         routerConfig: _router,
       );
         },

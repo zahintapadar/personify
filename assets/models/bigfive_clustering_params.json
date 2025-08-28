@@ -1,0 +1,68 @@
+{
+  "model_type": "bigfive_clustering_tensorflow",
+  "clustering_method": "kmeans",
+  "optimal_clusters": 7,
+  "silhouette_score": 0.14018072505802417,
+  "input_dim": 7,
+  "num_clusters": 7,
+  "personality_types": [
+    "Neurotic Agreeable",
+    "Extraverted Agreeable",
+    "Introverted Neurotic",
+    "Agreeable Open",
+    "Introverted Agreeable",
+    "Introverted Competitive",
+    "Extraverted Stable"
+  ],
+  "feature_names": [
+    "EXT_score",
+    "EST_score",
+    "AGR_score",
+    "CSN_score",
+    "OPN_score",
+    "screen_ratio",
+    "log_test_time"
+  ],
+  "test_accuracy": 0.9815789461135864,
+  "test_loss": 0.08783845603466034,
+  "best_val_accuracy": 0.9840666055679321,
+  "best_epoch": 21,
+  "training_time_seconds": 23.677332162857056,
+  "total_samples": 60798,
+  "train_samples": 38910,
+  "test_samples": 12160,
+  "epochs_trained": 36,
+  "max_samples": 100000,
+  "model_architecture": "Dense(128)->BN->Dense(64)->BN->Dense(32)->BN->Softmax",
+  "optimizer": "Adam(lr=0.001)",
+  "regularization": "L2(0.001) + BatchNorm + Dropout",
+  "cluster_analysis": {
+    "optimal_clusters": 7,
+    "silhouette_score": 0.14018072505802417,
+    "silhouette_scores": [
+      0.13748863206210624,
+      0.13834058697445076,
+      0.14018072505802417,
+      0.1321230344017817,
+      0.12783330992841246,
+      0.12804827170531038
+    ],
+    "inertias": [
+      276993.21384155186,
+      260969.89642704802,
+      246536.38811732747,
+      236047.7173747061,
+      227577.6313139677,
+      219531.60141434235
+    ],
+    "cluster_range": [
+      5,
+      6,
+      7,
+      8,
+      9,
+      10
+    ]
+  },
+  "created_timestamp": 1756325302.222301
+}

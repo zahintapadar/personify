@@ -6,8 +6,10 @@ import 'package:intl/intl.dart';
 import '../widgets/material_background.dart';
 import '../providers/personality_provider.dart';
 import '../providers/mbti_personality_provider.dart';
-import '../models/personality_result.dart';
+import '../providers/bigfive_personality_provider.dart';
+
 import '../models/mbti_personality_result.dart';
+import '../models/bigfive_personality_result.dart';
 
 class TestHistoryScreen extends StatefulWidget {
   const TestHistoryScreen({super.key});
@@ -29,6 +31,7 @@ class _TestHistoryScreenState extends State<TestHistoryScreen>
     WidgetsBinding.instance.addPostFrameCallback((_) {
       context.read<PersonalityProvider>().initializeML();
       context.read<MBTIPersonalityProvider>().initializeML();
+      context.read<BigFivePersonalityProvider>().initializeML();
     });
   }
 
@@ -126,30 +129,22 @@ class _TestHistoryScreenState extends State<TestHistoryScreen>
   }
 
   Widget _buildBigFiveHistory() {
-    return Consumer<PersonalityProvider>(
+    return Consumer<BigFivePersonalityProvider>(
       builder: (context, provider, child) {
-        if (!provider.isInitialized) {
-          return const Center(
-            child: CircularProgressIndicator(
-              valueColor: AlwaysStoppedAnimation<Color>(Color(0xFF8B5CF6)),
-            ),
-          );
-        }
-
         final history = provider.testHistory;
         
         if (history.isEmpty) {
           return _buildEmptyState(
             'No Big Five Tests Yet',
             'Take your first Big Five personality test to see your results here',
-            Icons.psychology,
-            () => context.push('/personality-test'),
+            Icons.insights,
+            () => context.push('/bigfive-test'),
           );
         }
 
         return RefreshIndicator(
           onRefresh: () async {
-            await provider.initializeML();
+            // Refresh not needed as data is automatically updated
           },
           color: const Color(0xFF8B5CF6),
           backgroundColor: const Color(0xFF1A1A2E),
@@ -158,7 +153,7 @@ class _TestHistoryScreenState extends State<TestHistoryScreen>
             itemCount: history.length,
             itemBuilder: (context, index) {
               final result = history[index];
-              return _buildBigFiveTestCard(result, index);
+              return _buildBigFiveCard(result, index);
             },
           ),
         );
@@ -263,144 +258,6 @@ class _TestHistoryScreenState extends State<TestHistoryScreen>
               ),
             ),
           ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildBigFiveTestCard(PersonalityResult result, int index) {
-    return Container(
-      margin: const EdgeInsets.only(bottom: 16),
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(16),
-        gradient: LinearGradient(
-          colors: [
-            const Color(0xFF3B82F6).withValues(alpha: 0.8),
-            const Color(0xFF1E40AF).withValues(alpha: 0.8),
-          ],
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-        ),
-        boxShadow: [
-          BoxShadow(
-            color: const Color(0xFF3B82F6).withValues(alpha: 0.3),
-            blurRadius: 12,
-            offset: const Offset(0, 4),
-          ),
-        ],
-      ),
-      child: Material(
-        color: Colors.transparent,
-        child: InkWell(
-          borderRadius: BorderRadius.circular(16),
-          onTap: () => _showTestDetails(result, 'Big Five'),
-          child: Padding(
-            padding: const EdgeInsets.all(20),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
-                  children: [
-                    Container(
-                      padding: const EdgeInsets.all(8),
-                      decoration: BoxDecoration(
-                        color: Colors.white.withValues(alpha: 0.2),
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                      child: const Icon(
-                        Icons.psychology,
-                        color: Colors.white,
-                        size: 20,
-                      ),
-                    ),
-                    const SizedBox(width: 12),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            'Big Five Personality Test',
-                            style: GoogleFonts.roboto(
-                              fontSize: 16,
-                              fontWeight: FontWeight.w600,
-                              color: Colors.white,
-                            ),
-                          ),
-                          Text(
-                            _formatDate(result.timestamp),
-                            style: GoogleFonts.roboto(
-                              fontSize: 12,
-                              color: Colors.white.withValues(alpha: 0.8),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                    Text(
-                      '#${index + 1}',
-                      style: GoogleFonts.roboto(
-                        fontSize: 12,
-                        fontWeight: FontWeight.w500,
-                        color: Colors.white.withValues(alpha: 0.7),
-                      ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 16),
-                Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                  decoration: BoxDecoration(
-                    color: Colors.white.withValues(alpha: 0.2),
-                    borderRadius: BorderRadius.circular(20),
-                  ),
-                  child: Text(
-                    result.personalityType,
-                    style: GoogleFonts.roboto(
-                      fontSize: 14,
-                      fontWeight: FontWeight.w600,
-                      color: Colors.white,
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 12),
-                Text(
-                  result.description.length > 100 
-                      ? '${result.description.substring(0, 100)}...'
-                      : result.description,
-                  style: GoogleFonts.roboto(
-                    fontSize: 14,
-                    color: Colors.white.withValues(alpha: 0.9),
-                    height: 1.4,
-                  ),
-                ),
-                const SizedBox(height: 16),
-                Row(
-                  children: [
-                    Icon(
-                      Icons.star,
-                      size: 16,
-                      color: Colors.white.withValues(alpha: 0.8),
-                    ),
-                    const SizedBox(width: 4),
-                    Text(
-                      result.confidencePercentage,
-                      style: GoogleFonts.roboto(
-                        fontSize: 14,
-                        fontWeight: FontWeight.w500,
-                        color: Colors.white.withValues(alpha: 0.8),
-                      ),
-                    ),
-                    const Spacer(),
-                    Icon(
-                      Icons.arrow_forward,
-                      size: 16,
-                      color: Colors.white.withValues(alpha: 0.8),
-                    ),
-                  ],
-                ),
-              ],
-            ),
-          ),
         ),
       ),
     );
@@ -856,6 +713,7 @@ class _TestHistoryScreenState extends State<TestHistoryScreen>
               Navigator.of(context).pop();
               await context.read<PersonalityProvider>().clearTestHistory();
               await context.read<MBTIPersonalityProvider>().clearTestHistory();
+              await context.read<BigFivePersonalityProvider>().clearTestHistory();
               if (mounted) {
                 ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(
@@ -891,5 +749,277 @@ class _TestHistoryScreenState extends State<TestHistoryScreen>
         behavior: SnackBarBehavior.floating,
       ),
     );
+  }
+
+  Widget _buildBigFiveCard(BigFivePersonalityResult result, int index) {
+    return Container(
+      margin: const EdgeInsets.only(bottom: 16),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(16),
+        gradient: LinearGradient(
+          colors: [
+            const Color(0xFF4F46E5).withValues(alpha: 0.8),
+            const Color(0xFF3730A3).withValues(alpha: 0.8),
+          ],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: const Color(0xFF4F46E5).withValues(alpha: 0.3),
+            blurRadius: 12,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          borderRadius: BorderRadius.circular(16),
+          onTap: () => _showBigFiveDetails(result),
+          child: Padding(
+            padding: const EdgeInsets.all(20),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.all(8),
+                      decoration: BoxDecoration(
+                        color: Colors.white.withValues(alpha: 0.2),
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: const Icon(
+                        Icons.insights,
+                        color: Colors.white,
+                        size: 20,
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'Big Five Personality Test',
+                            style: GoogleFonts.roboto(
+                              fontSize: 16,
+                              fontWeight: FontWeight.w600,
+                              color: Colors.white,
+                            ),
+                          ),
+                          Text(
+                            DateFormat('MMM d, y • h:mm a').format(result.timestamp),
+                            style: GoogleFonts.roboto(
+                              fontSize: 12,
+                              color: Colors.white.withValues(alpha: 0.7),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                      decoration: BoxDecoration(
+                        color: Colors.white.withValues(alpha: 0.2),
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: Text(
+                        '${result.confidence.toStringAsFixed(0)}%',
+                        style: GoogleFonts.roboto(
+                          fontSize: 11,
+                          fontWeight: FontWeight.w600,
+                          color: Colors.white,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 16),
+                
+                // Personality Type
+                Text(
+                  result.personalityType,
+                  style: GoogleFonts.roboto(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.white,
+                  ),
+                ),
+                const SizedBox(height: 8),
+                
+                Text(
+                  'Cluster: ${result.dominantCluster}',
+                  style: GoogleFonts.roboto(
+                    fontSize: 14,
+                    color: Colors.white.withValues(alpha: 0.8),
+                  ),
+                ),
+                const SizedBox(height: 12),
+                
+                // Trait scores mini visualization
+                Row(
+                  children: ['O', 'C', 'E', 'A', 'N'].map((trait) {
+                    final percentile = result.getTraitPercentile(trait);
+                    return Expanded(
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 2),
+                        child: Column(
+                          children: [
+                            Text(
+                              trait,
+                              style: GoogleFonts.roboto(
+                                fontSize: 12,
+                                fontWeight: FontWeight.w600,
+                                color: Colors.white,
+                              ),
+                            ),
+                            const SizedBox(height: 4),
+                            Container(
+                              height: 4,
+                              decoration: BoxDecoration(
+                                color: Colors.white.withValues(alpha: 0.3),
+                                borderRadius: BorderRadius.circular(2),
+                              ),
+                              child: FractionallySizedBox(
+                                widthFactor: percentile / 100,
+                                alignment: Alignment.centerLeft,
+                                child: Container(
+                                  decoration: BoxDecoration(
+                                    color: Colors.white,
+                                    borderRadius: BorderRadius.circular(2),
+                                  ),
+                                ),
+                              ),
+                            ),
+                            const SizedBox(height: 2),
+                            Text(
+                              '${percentile.round()}%',
+                              style: GoogleFonts.roboto(
+                                fontSize: 9,
+                                color: Colors.white.withValues(alpha: 0.7),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    );
+                  }).toList(),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  void _showBigFiveDetails(BigFivePersonalityResult result) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        backgroundColor: const Color(0xFF1A1A2E),
+        title: Text(
+          'Big Five Test Details',
+          style: GoogleFonts.roboto(
+            color: Colors.white,
+            fontWeight: FontWeight.w600,
+          ),
+        ),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              result.personalityType,
+              style: GoogleFonts.roboto(
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+                color: const Color(0xFF8B5CF6),
+              ),
+            ),
+            const SizedBox(height: 8),
+            Text(
+              'Confidence: ${result.confidence.toStringAsFixed(1)}%',
+              style: GoogleFonts.roboto(color: Colors.white70),
+            ),
+            Text(
+              'Cluster: ${result.dominantCluster}',
+              style: GoogleFonts.roboto(color: Colors.white70),
+            ),
+            Text(
+              'Date: ${DateFormat('MMM d, y • h:mm a').format(result.timestamp)}',
+              style: GoogleFonts.roboto(color: Colors.white70),
+            ),
+            const SizedBox(height: 16),
+            
+            // Trait scores
+            ...['O', 'C', 'E', 'A', 'N'].map((trait) {
+              final traitName = _getFullTraitName(trait);
+              final percentile = result.getTraitPercentile(trait);
+              final level = result.getTraitLevel(trait);
+              
+              return Padding(
+                padding: const EdgeInsets.only(bottom: 8),
+                child: Row(
+                  children: [
+                    SizedBox(
+                      width: 140,
+                      child: Text(
+                        traitName,
+                        style: GoogleFonts.roboto(
+                          color: Colors.white,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                    ),
+                    Expanded(
+                      child: Text(
+                        '$level (${percentile.round()}%)',
+                        style: GoogleFonts.roboto(
+                          color: Colors.white70,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              );
+            }),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(),
+            child: Text(
+              'Close',
+              style: GoogleFonts.roboto(color: const Color(0xFF8B5CF6)),
+            ),
+          ),
+          TextButton(
+            onPressed: () {
+              Navigator.of(context).pop();
+              context.read<BigFivePersonalityProvider>().setHistoricalResult(result);
+              context.push('/bigfive-result');
+            },
+            child: Text(
+              'View Full Results',
+              style: GoogleFonts.roboto(color: const Color(0xFF8B5CF6)),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  String _getFullTraitName(String trait) {
+    switch (trait) {
+      case 'O': return 'Openness';
+      case 'C': return 'Conscientiousness';
+      case 'E': return 'Extraversion';
+      case 'A': return 'Agreeableness';
+      case 'N': return 'Neuroticism';
+      default: return 'Unknown';
+    }
   }
 }

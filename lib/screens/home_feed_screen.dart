@@ -25,6 +25,7 @@ class _HomeFeedScreenState extends State<HomeFeedScreen> {
           backgroundColor: Colors.transparent,
           elevation: 0,
           scrolledUnderElevation: 0,
+          centerTitle: true,
           title: Text(
             'Personify',
             style: GoogleFonts.roboto(
@@ -111,11 +112,10 @@ class _HomeFeedScreenState extends State<HomeFeedScreen> {
                   // AI Support tab
                   _buildFeatureCard(
                     title: 'AI Support',
-                    subtitle: 'Coming Soon',
+                    subtitle: '24/7 AI companion',
                     icon: Icons.smart_toy,
                     gradient: [const Color(0xFF10B981), const Color(0xFF059669)],
-                    onTap: () => _showComingSoonDialog(context, 'AI Support', '24/7 access to a personalised AI psychologist'),
-                    isComingSoon: true,
+                    onTap: () => context.read<NavigationProvider>().setIndex(1), // Navigate to Support tab
                   ),
                   
                   // Meeting tab

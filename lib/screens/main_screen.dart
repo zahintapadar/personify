@@ -3,7 +3,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import '../providers/navigation_provider.dart';
 import 'home_feed_screen.dart';
-import 'discover_screen.dart';
+import 'support_screen.dart';
 import 'profile_screen.dart';
 import 'tests_screen.dart';
 
@@ -17,7 +17,7 @@ class MainScreen extends StatefulWidget {
 class _MainScreenState extends State<MainScreen> {
   final List<Widget> _screens = [
     const HomeFeedScreen(),
-    const DiscoverScreen(),
+    const SupportScreen(),
     const TestsScreen(),
     const ProfileScreen(),
   ];

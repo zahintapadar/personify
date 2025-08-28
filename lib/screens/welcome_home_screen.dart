@@ -55,10 +55,23 @@ class _WelcomeHomeScreenState extends State<WelcomeHomeScreen>
           ),
         ),
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () => _showAnimationSettings(context),
-        backgroundColor: Colors.white.withOpacity(0.9),
-        child: const Icon(Icons.settings, color: Color(0xFF421DA9)),
+      floatingActionButton: Column(
+        mainAxisAlignment: MainAxisAlignment.end,
+        children: [
+          FloatingActionButton(
+            heroTag: "chat",
+            onPressed: () => context.go('/chat'),
+            backgroundColor: Colors.deepPurple.withOpacity(0.9),
+            child: const Icon(Icons.psychology, color: Colors.white),
+          ),
+          const SizedBox(height: 16),
+          FloatingActionButton(
+            heroTag: "settings",
+            onPressed: () => _showAnimationSettings(context),
+            backgroundColor: Colors.white.withOpacity(0.9),
+            child: const Icon(Icons.settings, color: Color(0xFF421DA9)),
+          ),
+        ],
       ),
     );
   }
@@ -173,6 +186,25 @@ class _WelcomeHomeScreenState extends State<WelcomeHomeScreen>
           ],
           onTap: () => context.go('/mbti-test'),
           gradient: [Colors.purple.shade400, Colors.deepPurple.shade600],
+        ),
+        const SizedBox(height: 20),
+
+        // Big Five Test Card
+        _buildTestCard(
+          context,
+          title: 'Big Five Personality Test',
+          subtitle: 'Scientific OCEAN model assessment',
+          description:
+              'Explore your personality through the scientifically-backed Big Five model. Discover your scores in Openness, Conscientiousness, Extraversion, Agreeableness, and Neuroticism.',
+          icon: Icons.insights,
+          features: [
+            '5 Core Traits',
+            'Scientific Approach',
+            'Cluster Analysis',
+            'ML-Powered',
+          ],
+          onTap: () => context.go('/bigfive-test'),
+          gradient: [Colors.indigo.shade400, Colors.blue.shade600],
         ),
         const SizedBox(height: 20),
 
@@ -401,6 +433,72 @@ class _WelcomeHomeScreenState extends State<WelcomeHomeScreen>
                         child: Text(
                           'MBTI',
                           style: GoogleFonts.poppins(
+                            fontSize: 13,
+                            fontWeight: FontWeight.w600,
+                            color: Colors.white,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: AnimatedButton(
+                  onPressed: () => context.go('/bigfive-history'),
+                  backgroundColor: Colors.indigo.withOpacity(0.3),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 8,
+                    vertical: 12,
+                  ),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      const Icon(
+                        Icons.insights,
+                        color: Colors.white,
+                        size: 18,
+                      ),
+                      const SizedBox(width: 6),
+                      Flexible(
+                        child: Text(
+                          'Big Five',
+                          style: GoogleFonts.poppins(
+                            fontSize: 13,
+                            fontWeight: FontWeight.w600,
+                            color: Colors.white,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: AnimatedButton(
+                  onPressed: () => context.go('/test-history'),
+                  backgroundColor: Colors.teal.withOpacity(0.3),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 8,
+                    vertical: 12,
+                  ),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      const Icon(
+                        Icons.speed,
+                        color: Colors.white,
+                        size: 18,
+                      ),
+                      const SizedBox(width: 6),
+                      Flexible(
+                        child: Text(
+                          'All Tests',
+                          style: GoogleFonts.poppins(
                             color: Colors.white,
                             fontSize: 12,
                             fontWeight: FontWeight.w600,
@@ -416,7 +514,7 @@ class _WelcomeHomeScreenState extends State<WelcomeHomeScreen>
 
               Expanded(
                 child: AnimatedButton(
-                  onPressed: () => context.go('/history'),
+                  onPressed: () => context.go('/test-history'),
                   backgroundColor: Colors.teal.withOpacity(0.3),
                   padding: const EdgeInsets.symmetric(
                     horizontal: 8,

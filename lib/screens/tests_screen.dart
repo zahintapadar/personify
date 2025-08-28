@@ -42,43 +42,63 @@ class TestsScreen extends StatelessWidget {
               padding: const EdgeInsets.all(16.0),
               sliver: SliverList(
                 delegate: SliverChildListDelegate([
-                  _buildColorfulTestCard(
+                  _buildEnhancedTestCard(
                     context: context,
                     title: 'MBTI Personality Test',
+                    subtitle: '16 Personality Types',
                     description: 'Discover your Myers-Briggs personality type through comprehensive questions.',
                     icon: Icons.psychology,
                     gradient: [const Color(0xFF8B5CF6), const Color(0xFF3B82F6)],
+                    duration: '10 minutes',
+                    questions: '15 questions',
                     onTap: () => context.push('/mbti-test'),
                   ),
-                  const SizedBox(height: 16),
-                  _buildColorfulTestCard(
+                  const SizedBox(height: 20),
+                  _buildEnhancedTestCard(
                     context: context,
                     title: 'Big Five Personality Test',
+                    subtitle: 'OCEAN Model',
                     description: 'Explore the five major personality dimensions that define you.',
                     icon: Icons.star,
                     gradient: [const Color(0xFFEF4444), const Color(0xFFF97316)],
-                    onTap: () => context.push('/personality-test'),
+                    duration: '5 minutes',
+                    questions: '25 questions',
+                    onTap: () => context.push('/bigfive-test'),
                   ),
-                  const SizedBox(height: 16),
-                  _buildColorfulTestCard(
+                  const SizedBox(height: 20),
+                  _buildEnhancedTestCard(
                     context: context,
                     title: 'View Test History',
+                    subtitle: 'Your Journey',
                     description: 'Review your past test results and track your personality insights.',
                     icon: Icons.history,
                     gradient: [const Color(0xFF10B981), const Color(0xFF059669)],
+                    duration: 'Instant access',
+                    questions: 'All results',
                     onTap: () => context.push('/test-history'),
                   ),
-                  const SizedBox(height: 16),
-                  _buildColorfulTestCard(
+                  const SizedBox(height: 20),
+                  _buildEnhancedTestCard(
                     context: context,
                     title: 'Personality Insights',
+                    subtitle: 'Coming Soon',
                     description: 'Get detailed analysis and recommendations based on your results.',
                     icon: Icons.insights,
                     gradient: [const Color(0xFFF59E0B), const Color(0xFFEAB308)],
+                    duration: 'Soon',
+                    questions: 'Advanced AI',
                     onTap: () {
-                      // Coming soon functionality
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: const Text('Coming soon! Stay tuned for advanced personality insights.'),
+                          backgroundColor: const Color(0xFFF59E0B),
+                          behavior: SnackBarBehavior.floating,
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                        ),
+                      );
                     },
                   ),
+                  const SizedBox(height: 32),
                 ]),
               ),
             ),
@@ -88,18 +108,21 @@ class TestsScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildColorfulTestCard({
+  Widget _buildEnhancedTestCard({
     required BuildContext context,
     required String title,
+    required String subtitle,
     required String description,
     required IconData icon,
     required List<Color> gradient,
+    required String duration,
+    required String questions,
     required VoidCallback onTap,
   }) {
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 8),
       decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(20),
+        borderRadius: BorderRadius.circular(24),
         gradient: LinearGradient(
           colors: gradient,
           begin: Alignment.topLeft,
@@ -107,9 +130,10 @@ class TestsScreen extends StatelessWidget {
         ),
         boxShadow: [
           BoxShadow(
-            color: gradient[0].withOpacity(0.3),
-            blurRadius: 20,
-            offset: const Offset(0, 10),
+            color: gradient[0].withOpacity(0.4),
+            blurRadius: 24,
+            offset: const Offset(0, 12),
+            spreadRadius: 0,
           ),
         ],
       ),
@@ -117,68 +141,132 @@ class TestsScreen extends StatelessWidget {
         color: Colors.transparent,
         child: InkWell(
           onTap: onTap,
-          borderRadius: BorderRadius.circular(20),
-          child: Padding(
+          borderRadius: BorderRadius.circular(24),
+          child: Container(
             padding: const EdgeInsets.all(24.0),
-            child: Row(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Container(
-                  padding: const EdgeInsets.all(16),
-                  decoration: BoxDecoration(
-                    color: Colors.white.withOpacity(0.2),
-                    borderRadius: BorderRadius.circular(16),
-                    border: Border.all(
-                      color: Colors.white.withOpacity(0.3),
-                      width: 1,
+                Row(
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.all(16),
+                      decoration: BoxDecoration(
+                        color: Colors.white.withOpacity(0.25),
+                        borderRadius: BorderRadius.circular(20),
+                        border: Border.all(
+                          color: Colors.white.withOpacity(0.4),
+                          width: 1.5,
+                        ),
+                      ),
+                      child: Icon(
+                        icon,
+                        color: Colors.white,
+                        size: 32,
+                      ),
                     ),
-                  ),
-                  child: Icon(
-                    icon,
-                    color: Colors.white,
-                    size: 32,
+                    const SizedBox(width: 16),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            title,
+                            style: GoogleFonts.roboto(
+                              fontSize: 22,
+                              color: Colors.white,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          const SizedBox(height: 4),
+                          Text(
+                            subtitle,
+                            style: GoogleFonts.roboto(
+                              fontSize: 14,
+                              color: Colors.white.withOpacity(0.8),
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    Container(
+                      padding: const EdgeInsets.all(12),
+                      decoration: BoxDecoration(
+                        color: Colors.white.withOpacity(0.2),
+                        borderRadius: BorderRadius.circular(16),
+                      ),
+                      child: const Icon(
+                        Icons.arrow_forward_ios,
+                        color: Colors.white,
+                        size: 18,
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 20),
+                Text(
+                  description,
+                  style: GoogleFonts.roboto(
+                    fontSize: 15,
+                    color: Colors.white.withOpacity(0.9),
+                    height: 1.5,
                   ),
                 ),
-                const SizedBox(width: 20),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        title,
-                        style: GoogleFonts.roboto(
-                          fontSize: 20,
-                          color: Colors.white,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      const SizedBox(height: 8),
-                      Text(
-                        description,
-                        style: GoogleFonts.roboto(
-                          fontSize: 14,
-                          color: Colors.white.withOpacity(0.9),
-                          height: 1.4,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                Container(
-                  padding: const EdgeInsets.all(8),
-                  decoration: BoxDecoration(
-                    color: Colors.white.withOpacity(0.2),
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  child: const Icon(
-                    Icons.arrow_forward_ios,
-                    color: Colors.white,
-                    size: 16,
-                  ),
+                const SizedBox(height: 16),
+                Row(
+                  children: [
+                    _buildInfoChip(
+                      icon: Icons.access_time,
+                      label: duration,
+                    ),
+                    const SizedBox(width: 12),
+                    _buildInfoChip(
+                      icon: Icons.quiz,
+                      label: questions,
+                    ),
+                  ],
                 ),
               ],
             ),
           ),
         ),
+      ),
+    );
+  }
+
+  Widget _buildInfoChip({
+    required IconData icon,
+    required String label,
+  }) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+      decoration: BoxDecoration(
+        color: Colors.white.withOpacity(0.2),
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(
+          color: Colors.white.withOpacity(0.3),
+          width: 1,
+        ),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(
+            icon,
+            color: Colors.white,
+            size: 14,
+          ),
+          const SizedBox(width: 6),
+          Text(
+            label,
+            style: GoogleFonts.roboto(
+              fontSize: 12,
+              color: Colors.white,
+              fontWeight: FontWeight.w500,
+            ),
+          ),
+        ],
       ),
     );
   }
