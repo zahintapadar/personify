@@ -77,3 +77,16 @@ assets/models/*.pkl
 Personify.apk
 build/app/outputs/flutter-apk/*.apk
 
+# Environment variables and API keys - NEVER COMMIT THESE
+.env
+.env.local
+.env.*.local
+config.json
+secrets.json
+api_keys.json
+
+# Firebase and other service account keys
+**/google-services.json
+**/GoogleService-Info.plist
+firebase_options.dart
+

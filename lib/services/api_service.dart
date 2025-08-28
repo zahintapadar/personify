@@ -2,10 +2,11 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 import 'package:http/http.dart' as http;
+import '../config/app_config.dart';
 
 class ApiService {
   static const String _baseUrl = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent';
-  static const String _apiKey = 'AIzaSyB4WazzCTpwn4OzMDgW6SndembmYOL-NPM';
+  static String get _apiKey => AppConfig.geminiApiKey;
   
   static String _buildSystemPrompt(String userName) {
     return '''
