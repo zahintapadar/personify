@@ -43,39 +43,25 @@ app.*.map.json
 /android/app/debug
 /android/app/profile
 /android/app/release
-lib/data/mbti_personality.csv
-cache/advanced_tfidf_features_5000_2affa328.pkl
-assets/models/mbti_optimized_vectorizer.pickle
-cache/advanced_tfidf_vectorizer_5000_2affa328.pkl
 # .gitignore
 cache/tfidf_features_1000.pkl
 
 # APK files (too large for GitHub)
 *.apk
 Personify.apk
-lib/data/mbti_1.csv
-lib/data/mbti_personality.csv
-cache/advanced_tfidf_features_5000_2affa328.pkl
-assets/models/mbti_optimized_vectorizer.pickle
-cache/advanced_tfidf_vectorizer_5000_2affa328.pkl# Large files that should not be in git
+
+# Large files that should not be in git - Now using Git LFS for large files
+# Cache files (temporary, should not be tracked)
 cache/*.pkl
 cache/*.csv
-lib/data/*.csv
-assets/models/*.pickle
-assets/models/*.pkl
-*.h5
-*.keras
-*.tflite
-*.pickle
-*.pkl
-
-# Include model training scripts but exclude generated models
-!model_training/*.py
 
 # Large APK files should not be in git - use GitHub Releases instead
 *.apk
 Personify.apk
 build/app/outputs/flutter-apk/*.apk
+
+# Include model training scripts but exclude generated models
+!model_training/*.py
 
 # Environment variables and API keys - NEVER COMMIT THESE
 .env
